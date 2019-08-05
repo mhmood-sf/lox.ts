@@ -1,5 +1,5 @@
 {
-  "name": "nini",
+  "name": "lox.ts",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,13 +14,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/quantomistro/nini.git"
+    "url": "git+https://github.com/quantomistro/lox.ts.git"
   },
   "keywords": [],
   "author": "quantomistro",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/quantomistro/nini/issues"
+    "url": "https://github.com/quantomistro/lox.ts/issues"
   },
-  "homepage": "https://github.com/quantomistro/nini#readme"
+  "homepage": "https://github.com/quantomistro/lox.ts#readme"
 }
