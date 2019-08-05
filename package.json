@@ -1,0 +1,26 @@
+{
+  "name": "nini",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^12.6.9",
+    "typescript": "^3.4.5"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quantomistro/nini.git"
+  },
+  "keywords": [],
+  "author": "quantomistro",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/quantomistro/nini/issues"
+  },
+  "homepage": "https://github.com/quantomistro/nini#readme"
+}
