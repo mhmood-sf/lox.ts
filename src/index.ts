@@ -25,6 +25,9 @@ export class Lox {
             prompt: '-> '
         });
 
+        rl.write("nini REPL. Press Ctrl + C to exit.\n");
+        rl.prompt();
+
         rl.on("line", async line => {
             const source = line.trim();
             this.run(source);
@@ -33,9 +36,6 @@ export class Lox {
             this.hadError = false;
             rl.prompt();
         });
-
-        rl.write("nini REPL. Press Ctrl + C to exit.\n");
-        rl.prompt();
     }
 
     private static run(source: string): void {
