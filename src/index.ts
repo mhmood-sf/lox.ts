@@ -25,7 +25,7 @@ export class Lox {
             prompt: '-> '
         });
 
-        rl.write("nini REPL. Press Ctrl + C to exit.\n");
+        rl.write("lox.ts REPL. Press Ctrl + C to exit.\n");
         rl.prompt();
 
         rl.on("line", async line => {
@@ -63,7 +63,7 @@ export class Lox {
     const args = process.argv.slice(2);
 
     if (args.length > 1) {
-        console.log("Usage: nini [script]");
+        console.log("Usage: ./lox [script]");
         process.exit(64);
     } else if (args.length == 1) {
         Lox.runFile(args[0]);
