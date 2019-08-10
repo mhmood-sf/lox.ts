@@ -1,6 +1,10 @@
 import * as fs from "fs";
 import * as readline from "readline";
 import { Scanner } from "./scanner";
+import { Token } from "./token";
+import { TokenTypes } from "./token-type";
+import { Parser } from './parser';
+import { AstPrinter } from "./ast-printer";
 
 export class Lox {
     public static hadError: boolean = false;
@@ -41,18 +45,28 @@ export class Lox {
     private static run(source: string): void {
         const scanner = new Scanner(source);
         const tokens = scanner.scanTokens();
+        const parser = new Parser(tokens);
+        const expression = parser.parse();
 
-        for (const token of tokens) {
-            console.log(token.toString());
+        if (this.hadError || expression === null) return;
+
+        console.log(new AstPrinter().print(expression));
+    }
+
+    public static error(token: Token | number, message: string): void {
+        if (typeof token === 'number') {
+            this.report(token, "", message);
+        } else {
+            if (token.type === TokenTypes.EOF) {
+                this.report(token.line, " at end", message);
+            } else {
+                this.report(token.line, ` at '${token.lexeme}'`, message);
+            }
         }
     }
 
-    public static error(line: number, message: string): void {
-        this.report(line, "", message);
-    }
-
     public static report(line: number, where: string, message: string): void {
-        const msg = `[line ${line}] Error${where.startsWith(" ") ? where : " " + where}: ${message}`;
+        const msg = `[line ${line}] Error${where}: ${message}`;
         console.error(msg);
 
         this.hadError = true;

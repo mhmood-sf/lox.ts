@@ -2,7 +2,7 @@
   "name": "lox.ts",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "lox.js",
   "dependencies": {},
   "devDependencies": {
     "@types/node": "^12.6.9",

@@ -1,2 +1,2 @@
 @echo off
-node  "%~dp0\bin\index.js" %*
+node  "%~dp0\bin\lox.js" %*
