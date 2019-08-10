@@ -1,6 +1,6 @@
 import { TokenType, TokenTypes, Keywords } from "./token-type";
 import { Token, TokenLiteral } from "./token";
-import { Lox } from "./index";
+import { Lox } from "./lox";
 
 export class Scanner {
     private source: string;

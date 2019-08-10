@@ -1,6 +1,6 @@
 import { TokenType } from "./token-type";
 
-export type TokenLiteral = string | number | null;
+export type TokenLiteral = string | number | boolean | null;
 
 export class Token {
     public type: TokenType;
