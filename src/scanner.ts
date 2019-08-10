@@ -4,18 +4,13 @@ import { Lox } from "./index";
 
 export class Scanner {
     private source: string;
-    private tokens: Token[];
-    private start: number;
-    private current: number;
-    private line: number;
+    private tokens: Token[] = [];
+    private start: number = 0;
+    private current: number = 0;
+    private line: number = 1;
 
     constructor(source: string) {
         this.source = source;
-        this.tokens = [];
-
-        this.start = 0;
-        this.current = 0;
-        this.line = 1;
     }
 
     public scanTokens() {

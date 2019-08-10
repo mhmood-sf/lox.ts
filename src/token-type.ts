@@ -12,7 +12,7 @@ export type TokenType =
   
     'EOF';    
 
-export const Keywords: {[key: string]: TokenType} = {
+export const Keywords: {[k: string]: TokenType} = {
     and: 'AND',
     class: 'CLASS',
     else: 'ELSE',
@@ -51,10 +51,10 @@ export const TokenTypes = makeEnum([
 ]);
 
 // Creates a js object from a string[] where each key === value.
-function makeEnum(variants: TokenType[]): {[key: string]: TokenType } {
-    const _enum: {[key: string]: TokenType } = {};
-    for (const variant of variants) {
-        _enum[variant] = variant;
+function makeEnum(vars: TokenType[]): {[k: string]: TokenType } {
+    const _e: {[key: string]: TokenType } = {};
+    for (const v of vars) {
+        _e[v] = v;
     }
-    return _enum;
+    return _e;
 }

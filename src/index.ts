@@ -3,7 +3,7 @@ import * as readline from "readline";
 import { Scanner } from "./scanner";
 
 export class Lox {
-    public static hadError: boolean;
+    public static hadError: boolean = false;
 
     public static runFile(path: string): void {
         let source;
