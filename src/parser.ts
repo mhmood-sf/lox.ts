@@ -96,7 +96,7 @@ export class Parser {
             return new Grouping(expr);
         }
 
-        throw this.error(this.peek(), "Expect exression!");
+        throw this.error(this.peek(), "Expect expression!");
     }
 
     private consume(type: TokenType, message: string) {
