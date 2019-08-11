@@ -10,7 +10,7 @@ import {
 } from './expr';
 
 export class AstPrinter implements Visitor<string> {
-    public print(expr: Expr): string {
+    public print(expr: Expr) {
         return expr.accept(this);
     }
 
