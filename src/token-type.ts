@@ -52,9 +52,7 @@ export const TokenTypes = makeEnum([
 
 // Creates a js object from a string[] where each key === value.
 function makeEnum(vars: TokenType[]): {[k: string]: TokenType } {
-    const _e: {[key: string]: TokenType } = {};
-    for (const v of vars) {
-        _e[v] = v;
-    }
-    return _e;
+    const e: {[k: string]: TokenType } = {};
+    for (const v of vars) e[v] = v;
+    return e;
 }

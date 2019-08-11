@@ -1,14 +1,16 @@
 import { TokenType } from "./token-type";
 
-export type TokenLiteral = string | number | boolean | null;
+// Representing a Lox value in TS code. This is the same as
+// the use of `Object` in the java implementation.
+export type LoxValue = string | number | boolean | null;
 
 export class Token {
     public type: TokenType;
     public lexeme: string;
-    public literal: TokenLiteral;
+    public literal: LoxValue;
     public line: number;
 
-    constructor(type: TokenType, lexeme: string, literal: TokenLiteral, line: number) {
+    constructor(type: TokenType, lexeme: string, literal: LoxValue, line: number) {
         this.type = type;
         this.lexeme = lexeme;
         this.literal = literal;

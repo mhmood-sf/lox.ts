@@ -1,5 +1,5 @@
 import { TokenType, TokenTypes, Keywords } from "./token-type";
-import { Token, TokenLiteral } from "./token";
+import { Token, LoxValue } from "./token";
 import { Lox } from "./lox";
 
 export class Scanner {
@@ -137,7 +137,7 @@ export class Scanner {
         }
     }
 
-    private addToken(type: TokenType, literal?: TokenLiteral) {
+    private addToken(type: TokenType, literal?: LoxValue) {
         literal = literal === undefined ? null : literal;
         const lexeme = this.source.substring(this.start, this.current);
         this.tokens.push(new Token(type, lexeme, literal, this.line));

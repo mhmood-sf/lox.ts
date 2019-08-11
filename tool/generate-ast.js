@@ -46,7 +46,7 @@ function defineAst(outDir, baseName, types) {
     const path = outDir + '/' + baseName.toLowerCase() + '.ts';
     let content = "";
 
-    content += 'import { Token, TokenLiteral } from "./token";\n\n'
+    content += 'import { Token, LoxValue } from "./token";\n\n'
     
     content = defineVisitor(content, baseName, types);
 
@@ -76,7 +76,7 @@ function defineAst(outDir, baseName, types) {
     defineAst(outDir, "Expr", [
         "Binary   : left: Expr, operator: Token, right: Expr",
         "Grouping : expression: Expr",
-        "Literal  : value: TokenLiteral",
+        "Literal  : value: LoxValue",
         "Unary    : operator: Token, right: Expr"
     ]);
 

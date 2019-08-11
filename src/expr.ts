@@ -1,4 +1,4 @@
-import { Token, TokenLiteral } from "./token";
+import { Token, LoxValue } from "./token";
 
 export interface Visitor<T> {
     visitBinaryExpr: (expr: Binary) => T;
@@ -38,9 +38,9 @@ export class Grouping {
 }
 
 export class Literal {
-    public value: TokenLiteral;
+    public value: LoxValue;
 
-    public constructor(value: TokenLiteral) {
+    public constructor(value: LoxValue) {
         this.value = value;
     }
 
