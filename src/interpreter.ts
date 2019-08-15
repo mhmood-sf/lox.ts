@@ -1,8 +1,20 @@
 import { Visitor, Literal, Grouping, Expr, Unary, Binary } from './expr';
-import { LoxValue } from './token';
+import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
+import { RuntimeError } from './runtime-error';
+import { Lox } from './lox';
 
 export class Interpreter implements Visitor<LoxValue> {
+
+    public interpret(expression: Expr) {
+        try {
+            const value = this.evaluate(expression);
+            console.log(value !== null ? value.toString() : "nil");
+        } catch (err) {
+            Lox.runtimeError(err);
+        }
+    }
+
     public visitLiteralExpr(expr: Literal) {
         return expr.value;
     }
@@ -12,13 +24,15 @@ export class Interpreter implements Visitor<LoxValue> {
     }
 
     public visitUnaryExpr(expr: Unary) {
-        const right = this.evaluate(expr.right);
+        const rightRaw = this.evaluate(expr.right);
+        const rightStr = rightRaw !== null ? rightRaw.toString() : "null";
 
         switch (expr.operator.type) {
             case T.MINUS:
-                return -(parseFloat(right.toString()));
+                this.checkNumberOperands(expr.operator, rightRaw);
+                return -(parseFloat(rightStr));
             case T.BANG:
-                return !(this.isTruthy(right));
+                return !(this.isTruthy(rightRaw));
         }
 
         return null;
@@ -30,34 +44,53 @@ export class Interpreter implements Visitor<LoxValue> {
 
         switch (expr.operator.type) {
             case T.GREATER:
-                return parseFloat(left.toString()) > parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return left! > right!;
             case T.GREATER_EQUAL:
-                return parseFloat(left.toString()) >= parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return left! >= right!;
             case T.LESS:
-                return parseFloat(left.toString()) < parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return left! < right!;
             case T.LESS_EQUAL:
-                return parseFloat(left.toString()) <= parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return left! <= right!;
             case T.BANG_EQUAL:
+                this.checkNumberOperands(expr.operator, left, right);
                 return !this.isEqual(left, right);
             case T.EQUAL_EQUAL:
-                return this.isEqual(left, right);
+                this.checkNumberOperands(expr.operator, left, right);
+                return this.isEqual(left, right)
             case T.MINUS:
-                return parseFloat(left.toString()) - parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return (left as any) - (right as any);
             case T.PLUS:
                 if (typeof left === 'number' && typeof right === 'number') {
-                    return parseFloat(left.toString()) + parseFloat(right.toString());
+                    return left + right;
                 }
 
                 if (typeof left === 'string' && typeof right === 'string') {
-                    return left.toString() + right.toString();
+                    return left + right;
                 }
+
+                throw new RuntimeError(expr.operator, "Operands must be strings or numbers");
             case T.SLASH:
-                return parseFloat(left.toString()) / parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return (left as any) / (right as any);
             case T.STAR:
-                return parseFloat(left.toString()) * parseFloat(right.toString());
+                this.checkNumberOperands(expr.operator, left, right);
+                return (left as any) * (right as any);
         }
 
         return null;
+    }
+
+    private checkNumberOperands(operator: Token, ...operands: LoxValue[]) {
+        for (const operand of operands) {
+            if (typeof operand !== 'number') {
+                throw new RuntimeError(operator, "Operands must be numbers!");
+            }
+        }
     }
 
     private evaluate(expr: Expr): LoxValue {
