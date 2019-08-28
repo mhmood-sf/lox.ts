@@ -42,11 +42,9 @@ function defineVisitor(content, baseName, types) {
     return content;
 }
 
-function defineAst(outDir, baseName, types) {
+function defineAst(outDir, baseName, types, imports) {
     const path = outDir + '/' + baseName.toLowerCase() + '.ts';
-    let content = "";
-
-    content += 'import { Token, LoxValue } from "./token";\n\n'
+    let content = imports.endsWith(';') ? imports + '\n\n' : imports + ';\n\n';
     
     content = defineVisitor(content, baseName, types);
 
@@ -67,7 +65,7 @@ function defineAst(outDir, baseName, types) {
     const args = process.argv.slice(2);
 
     if (args.length !== 1) {
-        console.error("Usage: node generate-ast <outdir");
+        console.error("Usage: node generate-ast <outdir>");
         process.exit(1);
     }
 
@@ -78,6 +76,11 @@ function defineAst(outDir, baseName, types) {
         "Grouping : expression: Expr",
         "Literal  : value: LoxValue",
         "Unary    : operator: Token, right: Expr"
-    ]);
+    ], 'import { Token, LoxValue } from "./token"');
+
+    defineAst(outDir, "Stmt", [
+        "Expression : expression: Expr",
+        "Print      : expression: Expr"
+    ], 'import { Expr } from "./expr"');
 
 })();

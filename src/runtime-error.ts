@@ -8,4 +8,3 @@ export class RuntimeError extends Error {
         this.token = token;
     }
 }
-

@@ -21,4 +21,3 @@ export class Token {
         return `(Type: ${this.type} | Lexeme: ${this.lexeme})`;
     }
 }
-

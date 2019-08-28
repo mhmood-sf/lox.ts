@@ -51,13 +51,18 @@ export class Lox {
         const scanner = new Scanner(source);
         const tokens = scanner.scanTokens();
         const parser = new Parser(tokens);
-        const expression = parser.parse();
+        const statements = parser.parse();
 
-        if (this.hadError || expression === null) return;
+        if (this.hadError) return;
 
-        this.interpreter.interpret(expression);
+        if (statements === null) {
+            console.log("Program terminated due to error!");
+        }
+        else {
+            this.interpreter.interpret(statements);
+        }
 
-        console.log(new AstPrinter().print(expression));
+        // console.log(new AstPrinter().print(expression));
     }
 
     public static error(token: Token | number, message: string): void {
@@ -73,7 +78,7 @@ export class Lox {
     }
 
     public static runtimeError(err: RuntimeError) {
-        console.log(`${err.message}\n[line ${err.token.line}]`);
+        this.report(err.token.line, '', err.message);
         this.hadRuntimeError = true;
     }
 

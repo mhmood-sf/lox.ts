@@ -1,15 +1,17 @@
-import { Visitor, Literal, Grouping, Expr, Unary, Binary } from './expr';
+import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary } from './expr';
+import { Visitor as StmtVisitor, Expression, Print, Stmt } from './stmt';
 import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
 import { Lox } from './lox';
 
-export class Interpreter implements Visitor<LoxValue> {
+export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
 
-    public interpret(expression: Expr) {
+    public interpret(statements: Stmt[]) {
         try {
-            const value = this.evaluate(expression);
-            console.log(value !== null ? value.toString() : "nil");
+            for (const statement of statements) {
+                this.execute(statement);
+            }
         } catch (err) {
             Lox.runtimeError(err);
         }
@@ -95,6 +97,19 @@ export class Interpreter implements Visitor<LoxValue> {
 
     private evaluate(expr: Expr): LoxValue {
         return expr.accept<LoxValue>(this);
+    }
+
+    private execute(stmt: Stmt) {
+        stmt.accept(this);
+    }
+
+    public visitExpressionStmt(stmt: Expression) {
+        this.evaluate(stmt.expression);
+    }
+
+    public visitPrintStmt(stmt: Print) {
+        const value = this.evaluate(stmt.expression);
+        console.log(value !== null ? value.toString() : 'nil');
     }
 
     private isTruthy(val: any) {
