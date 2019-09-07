@@ -1,7 +1,7 @@
 import { Token } from './token';
 import { Stmt, Print, Expression, Var } from './stmt';
 import { TokenTypes as T, TokenType } from './token-type';
-import { Expr, Binary, Unary, Literal, Grouping, Variable } from './expr';
+import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expr';
 import { Lox } from './lox';
 
 export class Parser {
@@ -56,8 +56,26 @@ export class Parser {
         return new Expression(expr);
     }
 
+    private assignment(): Expr {
+        const expr = this.equality();
+
+        if (this.match(T.EQUAL)) {
+            const equals = this.previous();
+            const value = this.assignment();
+
+            if (expr instanceof Variable) {
+                const name = expr.name;
+                return new Assign(name, value);
+            }
+
+            this.error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
+    }
+
     private expression() {
-        return this.equality();
+        return this.assignment();
     }
 
     private declaration() {

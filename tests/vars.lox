@@ -1,0 +1,7 @@
+// Test variables
+var a = 69;
+var b = 420;
+print a + b;
+var a = "420";
+var b = "69";
+print "'" + a + "." + b + "'";

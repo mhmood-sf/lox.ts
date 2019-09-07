@@ -1,4 +1,4 @@
-import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable } from './expr';
+import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign } from './expr';
 import { Visitor as StmtVisitor, Expression, Print, Stmt, Var } from './stmt';
 import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
@@ -127,6 +127,13 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
 
         this.environment.define(stmt.name.lexeme, value);
 
+    }
+
+    public visitAssignExpr(expr: Assign) {
+        const value = this.evaluate(expr.value);
+
+        this.environment.assign(expr.name, value);
+        return value;
     }
 
     private isTruthy(val: any) {

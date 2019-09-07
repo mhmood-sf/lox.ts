@@ -46,3 +46,4 @@ export class Var {
         return visitor.visitVarStmt(this);
     }
 }
+

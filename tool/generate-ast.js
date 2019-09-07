@@ -72,6 +72,7 @@ function defineAst(outDir, baseName, types, imports) {
     const outDir = args[0];
 
     defineAst(outDir, "Expr", [
+        "Assign   : name: Token, value: Expr",
         "Binary   : left: Expr, operator: Token, right: Expr",
         "Grouping : expression: Expr",
         "Literal  : value: LoxValue",
@@ -82,7 +83,8 @@ function defineAst(outDir, baseName, types, imports) {
     defineAst(outDir, "Stmt", [
         "Expression : expression: Expr",
         "Print      : expression: Expr",
-        "Var        : name: Token, initializer: Expr"
+        // initializer is Expr | null to stop typescript from complaining.
+        "Var        : name: Token, initializer: Expr | null"
     ], 'import { Expr } from "./expr";\nimport { Token } from "./token"');
 
 })();
