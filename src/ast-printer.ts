@@ -6,7 +6,8 @@ import {
     Binary,
     Grouping,
     Literal,
-    Unary
+    Unary,
+    Variable
 } from './expr';
 
 export class AstPrinter implements Visitor<string> {
@@ -25,6 +26,10 @@ export class AstPrinter implements Visitor<string> {
     public visitLiteralExpr(expr: Literal) {
         if (expr.value === null) return "nil";
         return expr.value.toString();
+    }
+
+    public visitVariableExpr(expr: Variable) {
+        return expr.name.lexeme;
     }
 
     public visitUnaryExpr(expr: Unary) {

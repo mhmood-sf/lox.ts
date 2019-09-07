@@ -1,11 +1,13 @@
-import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt } from './stmt';
+import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable } from './expr';
+import { Visitor as StmtVisitor, Expression, Print, Stmt, Var } from './stmt';
 import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
+import { Environment } from './environment';
 import { Lox } from './lox';
 
 export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
+    private environment: Environment = new Environment();
 
     public interpret(statements: Stmt[]) {
         try {
@@ -38,6 +40,10 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
         }
 
         return null;
+    }
+
+    public visitVariableExpr(expr: Variable) {
+        return this.environment.get(expr.name);
     }
 
     public visitBinaryExpr(expr: Binary) {
@@ -110,6 +116,17 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
     public visitPrintStmt(stmt: Print) {
         const value = this.evaluate(stmt.expression);
         console.log(value !== null ? value.toString() : 'nil');
+    }
+
+    public visitVarStmt(stmt: Var) {
+        let value: LoxValue = null;
+
+        if (stmt.initializer != null) {
+            value = this.evaluate(stmt.initializer);
+        }
+
+        this.environment.define(stmt.name.lexeme, value);
+
     }
 
     private isTruthy(val: any) {

@@ -1,7 +1,7 @@
 import { Token } from './token';
-import { Stmt, Print, Expression } from './stmt';
+import { Stmt, Print, Expression, Var } from './stmt';
 import { TokenTypes as T, TokenType } from './token-type';
-import { Expr, Binary, Unary, Literal, Grouping } from './expr';
+import { Expr, Binary, Unary, Literal, Grouping, Variable } from './expr';
 import { Lox } from './lox';
 
 export class Parser {
@@ -17,7 +17,7 @@ export class Parser {
             const statements: Stmt[] = [];
 
             while (!this.isAtEnd()) {
-                statements.push(this.statement());
+                statements.push(this.declaration());
             }
             return statements;
 
@@ -38,6 +38,18 @@ export class Parser {
         return new Print(value);
     }
 
+    private varDeclaration() {
+        const name = this.consume(T.IDENTIFIER, "Expect variable name.");
+
+        let initializer: Expr | null = null;
+        if (this.match(T.EQUAL)) {
+            initializer = this.expression();
+        }
+
+        this.consume(T.SEMICOLON, "Expect ';' after variable declaration.");
+        return new Var(name, initializer);
+    }
+
     private expressionStatement() {
         const expr = this.expression();
         this.consume(T.SEMICOLON, "Expect ';' after expression.");
@@ -46,6 +58,18 @@ export class Parser {
 
     private expression() {
         return this.equality();
+    }
+
+    private declaration() {
+        try {
+            if (this.match(T.VAR)) return this.varDeclaration();
+
+            return this.statement();
+        } catch (err) {
+            this.synchronize();
+            // Stmt[] does not accept null.
+            return new Expression(new Literal(null));
+        }
     }
 
     private equality() {
@@ -113,6 +137,10 @@ export class Parser {
 
         if (this.match(T.NUMBER, T.STRING)) {
             return new Literal(this.previous().literal);
+        }
+
+        if (this.match(T.IDENTIFIER)) {
+            return new Variable(this.previous());
         }
 
         if (this.match(T.LEFT_PAREN)) {
