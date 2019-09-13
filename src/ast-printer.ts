@@ -8,7 +8,8 @@ import {
     Literal,
     Unary,
     Variable,
-    Assign
+    Assign,
+    Logical
 } from './expr';
 
 export class AstPrinter implements Visitor<string> {
@@ -39,6 +40,10 @@ export class AstPrinter implements Visitor<string> {
 
     public visitAssignExpr(expr: Assign) {
         return expr.name.lexeme;
+    }
+
+    public visitLogicalExpr(expr: Logical) {
+        return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
     }
 
     private parenthesize(name: string, ...exprs: Expr[]): string {

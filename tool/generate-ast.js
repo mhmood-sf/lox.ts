@@ -75,6 +75,7 @@ function defineAst(outDir, baseName, types, imports) {
         "Binary   : left: Expr, operator: Token, right: Expr",
         "Grouping : expression: Expr",
         "Literal  : value: LoxValue",
+        "Logical  : left: Expr, operator: Token, right: Expr",
         "Unary    : operator: Token, right: Expr",
         "Variable : name: Token"
     ], 'import { Token, LoxValue } from "./token"');
@@ -82,6 +83,7 @@ function defineAst(outDir, baseName, types, imports) {
     defineAst(outDir, "Stmt", [
         "Block      : statements: Stmt[]",
         "Expression : expression: Expr",
+        "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
         "Print      : expression: Expr",
         // initializer is Expr | null to stop typescript from complaining.
         "Var        : name: Token, initializer: Expr | null"

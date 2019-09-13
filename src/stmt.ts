@@ -4,11 +4,12 @@ import { Token } from "./token";
 export interface Visitor<T> {
     visitBlockStmt: (stmt: Block) => T;
     visitExpressionStmt: (stmt: Expression) => T;
+    visitIfStmt: (stmt: If) => T;
     visitPrintStmt: (stmt: Print) => T;
     visitVarStmt: (stmt: Var) => T;
 }
 
-export type Stmt = Block | Expression | Print | Var;
+export type Stmt = Block | Expression | If | Print | Var;
 
 export class Block {
     public statements: Stmt[];
@@ -31,6 +32,22 @@ export class Expression {
 
     public accept<T>(visitor: Visitor<T>): T {
         return visitor.visitExpressionStmt(this);
+    }
+}
+
+export class If {
+    public condition: Expr;
+    public thenBranch: Stmt;
+    public elseBranch: Stmt | null;
+
+    public constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null) {
+        this.condition = condition;
+        this.thenBranch = thenBranch;
+        this.elseBranch = elseBranch;
+    }
+
+    public accept<T>(visitor: Visitor<T>): T {
+        return visitor.visitIfStmt(this);
     }
 }
 

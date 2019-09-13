@@ -1,5 +1,5 @@
-import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block } from './stmt';
+import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical } from './expr';
+import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If } from './stmt';
 import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
@@ -21,6 +21,18 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
 
     public visitLiteralExpr(expr: Literal) {
         return expr.value;
+    }
+
+    public visitLogicalExpr(expr: Logical) {
+        const left = this.evaluate(expr.left);
+
+        if (expr.operator.type === T.OR) {
+            if (this.isTruthy(left)) return left;
+        } else {
+            if (!this.isTruthy(left)) return left;
+        }
+
+        return this.evaluate(expr.right);
     }
 
     public visitGroupingExpr(expr: Grouping) {
@@ -130,6 +142,15 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
 
     public visitExpressionStmt(stmt: Expression) {
         this.evaluate(stmt.expression);
+    }
+
+    public visitIfStmt(stmt: If) {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);
+        } else if (stmt.elseBranch !== null) {
+            this.execute(stmt.elseBranch);
+        }
+        return null;
     }
 
     public visitPrintStmt(stmt: Print) {
