@@ -63,7 +63,6 @@ function defineAst(outDir, baseName, types, imports) {
 
 (function main() {
     const args = process.argv.slice(2);
-
     if (args.length !== 1) {
         console.error("Usage: node generate-ast <outdir>");
         process.exit(1);
@@ -81,6 +80,7 @@ function defineAst(outDir, baseName, types, imports) {
     ], 'import { Token, LoxValue } from "./token"');
 
     defineAst(outDir, "Stmt", [
+        "Block      : statements: Stmt[]",
         "Expression : expression: Expr",
         "Print      : expression: Expr",
         // initializer is Expr | null to stop typescript from complaining.

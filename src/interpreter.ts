@@ -1,5 +1,5 @@
 import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt, Var } from './stmt';
+import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block } from './stmt';
 import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
@@ -107,6 +107,25 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
 
     private execute(stmt: Stmt) {
         stmt.accept(this);
+    }
+
+    private executeBlock(statements: Stmt[], environment: Environment) {
+        const { environment: previous } = this;
+
+        try {
+            this.environment = environment;
+
+            for (const statement of statements) {
+                this.execute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+
+    public visitBlockStmt(stmt: Block) {
+        this.executeBlock(stmt.statements, new Environment(this.environment));
+        return null;
     }
 
     public visitExpressionStmt(stmt: Expression) {
