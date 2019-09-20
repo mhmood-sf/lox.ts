@@ -1,5 +1,5 @@
 import { Token } from './token';
-import { Stmt, Print, Expression, Var, Block, If } from './stmt';
+import { Stmt, Print, Expression, Var, Block, If, While } from './stmt';
 import { TokenTypes as T, TokenType } from './token-type';
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical } from './expr';
 import { Lox } from './lox';
@@ -28,6 +28,7 @@ export class Parser {
 
     private statement(): Stmt {
         if (this.match(T.PRINT)) return this.printStatement();
+        if (this.match(T.WHILE)) return this.whileStatement();
         if (this.match(T.LEFT_BRACE)) return new Block(this.block());
         if (this.match(T.IF)) return this.ifStatement();
 
@@ -64,6 +65,15 @@ export class Parser {
 
         this.consume(T.SEMICOLON, "Expect ';' after variable declaration.");
         return new Var(name, initializer);
+    }
+
+    private whileStatement() {
+        this.consume(T.LEFT_PAREN, "Expect '(' after 'while'.");
+        const condition = this.expression();
+        this.consume(T.RIGHT_PAREN, "Expect ')' after condition.");
+        const body = this.statement();
+
+        return new While(condition, body);
     }
 
     private expressionStatement() {

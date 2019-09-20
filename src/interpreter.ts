@@ -1,5 +1,5 @@
 import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If } from './stmt';
+import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While } from './stmt';
 import { LoxValue, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
@@ -167,6 +167,12 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
 
         this.environment.define(stmt.name.lexeme, value);
 
+    }
+
+    public visitWhileStmt(stmt: While) {
+        while (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.body);
+        }
     }
 
     public visitAssignExpr(expr: Assign) {

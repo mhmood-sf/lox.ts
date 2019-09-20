@@ -86,7 +86,8 @@ function defineAst(outDir, baseName, types, imports) {
         "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
         "Print      : expression: Expr",
         // initializer is Expr | null to stop typescript from complaining.
-        "Var        : name: Token, initializer: Expr | null"
+        "Var        : name: Token, initializer: Expr | null",
+        "While      : condition: Expr, body: Stmt"
     ], 'import { Expr } from "./expr";\nimport { Token } from "./token"');
 
 })();
