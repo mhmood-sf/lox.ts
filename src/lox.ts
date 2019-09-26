@@ -4,7 +4,7 @@ import { Scanner } from "./scanner";
 import { Token } from "./token";
 import { TokenTypes } from "./token-type";
 import { Parser } from './parser';
-import { AstPrinter } from "./ast-printer";
+// import { AstPrinter } from "./ast-printer";
 import { RuntimeError } from "./runtime-error";
 import { Interpreter } from "./interpreter";
 

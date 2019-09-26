@@ -1,10 +1,18 @@
-import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical } from './expr';
+import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical, Call } from './expr';
 import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While } from './stmt';
 import { LoxLiteral, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
 import { Environment } from './environment';
 import { Lox } from './lox';
+import { LoxCallable } from './lox-callable';
+
+function isLoxCallable(callee: any): callee is LoxCallable {
+    return callee.call &&
+    (typeof callee.call === 'function') &&
+    callee.arity &&
+    (typeof callee.arity === 'function');
+}
 
 export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     private environment: Environment = new Environment();
@@ -103,6 +111,26 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         }
 
         return null;
+    }
+
+    public visitCallExpr(expr: Call) {
+        const callee = this.evaluate(expr.callee);
+
+        const args = [];
+        for (const arg of expr.args) {
+            args.push(this.evaluate(arg));
+        }
+
+        if (!isLoxCallable(callee)) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+
+        const fn = callee;
+        if (args.length != fn.arity()) {
+            throw new RuntimeError(expr.paren, `Expected ${fn.arity()} arguments but got ${args.length}.`);
+        }
+
+        return fn.call(this, args);
     }
 
     private checkNumberOperands(operator: Token, ...operands: LoxLiteral[]) {

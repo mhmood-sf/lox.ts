@@ -1,7 +1,7 @@
 import { Token } from './token';
 import { Stmt, Print, Expression, Var, Block, If, While } from './stmt';
 import { TokenTypes as T, TokenType } from './token-type';
-import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical } from './expr';
+import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call } from './expr';
 import { Lox } from './lox';
 
 export class Parser {
@@ -247,7 +247,38 @@ export class Parser {
             return new Unary(operator, right);
         }
 
-        return this.primary();
+        return this.call();
+    }
+
+    private call() {
+        let expr: Expr = this.primary();
+
+        while (true) {
+            if (this.match(T.LEFT_PAREN)) {
+                expr = this.finishCall(expr);
+            } else {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+    private finishCall(callee: Expr) {
+        const args = [];
+
+        if (!this.check(T.RIGHT_PAREN)) {
+            do {
+                if (args.length >= 255) {
+                    this.error(this.peek(), "Cannot have more than 255 arguments.");
+                }
+                args.push(this.expression());
+            } while (this.match(T.COMMA));
+        }
+
+        const paren = this.consume(T.RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Call(callee, paren, args);
     }
 
     private primary() {

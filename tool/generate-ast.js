@@ -73,6 +73,7 @@ function defineAst(outDir, baseName, types, imports) {
     defineAst(outDir, "Expr", [
         "Assign   : name: Token, value: Expr",
         "Binary   : left: Expr, operator: Token, right: Expr",
+        "Call     : callee: Expr, paren: Token, args: Expr[]",
         "Grouping : expression: Expr",
         "Literal  : value: LoxLiteral",
         "Logical  : left: Expr, operator: Token, right: Expr",
