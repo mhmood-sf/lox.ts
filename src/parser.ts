@@ -31,8 +31,49 @@ export class Parser {
         if (this.match(T.WHILE)) return this.whileStatement();
         if (this.match(T.LEFT_BRACE)) return new Block(this.block());
         if (this.match(T.IF)) return this.ifStatement();
+        if (this.match(T.FOR)) return this.forStatement();
 
         return this.expressionStatement();
+    }
+
+    private forStatement() {
+        this.consume(T.LEFT_PAREN, "Expect '(' after 'for'.");
+
+        let initializer: Stmt | null = null;
+        if (this.match(T.SEMICOLON)) {
+            initializer = null;
+        } else if (this.match(T.VAR)) {
+            initializer = this.varDeclaration();
+        } else {
+            initializer = this.expressionStatement();
+        }
+
+        let condition: Expr | null = null;
+        if (!this.check(T.SEMICOLON)) {
+            condition = this.expression();
+        }
+        this.consume(T.SEMICOLON, "Expect ';' after loop condition.");
+
+        // The last clause, doesn't need to be an increment but that's what's in the book :/
+        let increment: Expr | null = null;
+        if (this.check(T.RIGHT_PAREN)) {
+            increment = this.expression();
+        }
+        this.consume(T.RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        let body = this.statement();
+        if (increment != null) {
+            body = new Block([body, new Expression(increment)]);
+        }
+
+        if (condition == null) condition = new Literal(true);
+        body = new While(condition, body);
+
+        if (initializer != null) {
+            body = new Block([initializer, body]);
+        }
+
+        return body;
     }
 
     private ifStatement() {
