@@ -1,12 +1,12 @@
 import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical } from './expr';
 import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While } from './stmt';
-import { LoxValue, Token } from './token';
+import { LoxLiteral, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
 import { Environment } from './environment';
 import { Lox } from './lox';
 
-export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
+export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     private environment: Environment = new Environment();
 
     public interpret(statements: Stmt[]) {
@@ -105,7 +105,7 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
         return null;
     }
 
-    private checkNumberOperands(operator: Token, ...operands: LoxValue[]) {
+    private checkNumberOperands(operator: Token, ...operands: LoxLiteral[]) {
         for (const operand of operands) {
             if (typeof operand !== 'number') {
                 throw new RuntimeError(operator, "Operands must be numbers!");
@@ -113,8 +113,8 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
         }
     }
 
-    private evaluate(expr: Expr): LoxValue {
-        return expr.accept<LoxValue>(this);
+    private evaluate(expr: Expr): LoxLiteral {
+        return expr.accept<LoxLiteral>(this);
     }
 
     private execute(stmt: Stmt) {
@@ -159,7 +159,7 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
     }
 
     public visitVarStmt(stmt: Var) {
-        let value: LoxValue = null;
+        let value: LoxLiteral = null;
 
         if (stmt.initializer != null) {
             value = this.evaluate(stmt.initializer);
@@ -189,7 +189,7 @@ export class Interpreter implements ExprVisitor<LoxValue>, StmtVisitor<void> {
         return true;
     }
 
-    private isEqual(a: LoxValue, b: LoxValue) {
+    private isEqual(a: LoxLiteral, b: LoxLiteral) {
         return a === b;
     }
 }

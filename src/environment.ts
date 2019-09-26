@@ -1,8 +1,8 @@
-import { LoxValue, Token } from './token';
+import { LoxLiteral, Token } from './token';
 import { RuntimeError } from './runtime-error';
 
 export class Environment {
-    private values: Map<string, LoxValue> = new Map();
+    private values: Map<string, LoxLiteral> = new Map();
     private enclosing?: Environment;
 
     public constructor(enclosing?: Environment) {
@@ -11,11 +11,11 @@ export class Environment {
         }
     }
 
-    public define(name: string, value: LoxValue) {
+    public define(name: string, value: LoxLiteral) {
         this.values.set(name, value);
     }
 
-    public get(name: Token): LoxValue {
+    public get(name: Token): LoxLiteral {
         const value = this.values.has(name.lexeme) ? this.values.get(name.lexeme) : undefined;
 
         if (value !== undefined) return value;
@@ -25,7 +25,7 @@ export class Environment {
         else throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
     }
 
-    public assign(name: Token, value: LoxValue) {
+    public assign(name: Token, value: LoxLiteral) {
         if (this.values.has(name.lexeme)) this.values.set(name.lexeme, value);
 
         else if (this.enclosing) this.enclosing.assign(name, value);

@@ -1,4 +1,4 @@
-import { Token, LoxValue } from "./token";
+import { Token, LoxLiteral } from "./token";
 
 export interface Visitor<T> {
     visitAssignExpr: (expr: Assign) => T;
@@ -55,9 +55,9 @@ export class Grouping {
 }
 
 export class Literal {
-    public value: LoxValue;
+    public value: LoxLiteral;
 
-    public constructor(value: LoxValue) {
+    public constructor(value: LoxLiteral) {
         this.value = value;
     }
 
