@@ -1,3 +1,2 @@
 // This is a comment
 print "Hello world!";
-print 1 + 1 + (1 - 123) + 1234 * 4;
