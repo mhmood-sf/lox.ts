@@ -1,5 +1,3 @@
-import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical, Call } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While, Func, Return } from './stmt';
 import { LoxLiteral, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
@@ -8,7 +6,30 @@ import { LoxCallable } from './lox-callable';
 import { LoxFunction } from './lox-function';
 import { ReturnException } from './return-exception';
 import { Lox } from './lox';
-
+import {
+    Visitor as ExprVisitor,
+    Literal,
+    Grouping,
+    Expr,
+    Unary,
+    Binary,
+    Variable,
+    Assign,
+    Logical,
+    Call
+} from './expr';
+import {
+    Visitor as StmtVisitor,
+    Expression,
+    Print,
+    Stmt,
+    Var,
+    Block,
+    If,
+    While,
+    Func,
+    Return
+} from './stmt';
 
 function isLoxCallable(callee: any): callee is LoxCallable {
     return callee.call &&
