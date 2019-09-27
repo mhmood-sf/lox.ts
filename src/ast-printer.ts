@@ -9,12 +9,17 @@ import {
     Unary,
     Variable,
     Assign,
-    Logical
+    Logical,
+    Call
 } from './expr';
 
 export class AstPrinter implements Visitor<string> {
     public print(expr: Expr) {
         return expr.accept(this);
+    }
+
+    public visitCallExpr(expr: Call) {
+        return this.parenthesize(expr.paren.lexeme, expr.callee, ...expr.args);
     }
 
     public visitBinaryExpr(expr: Binary) {
