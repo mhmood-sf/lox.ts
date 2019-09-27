@@ -56,9 +56,10 @@ export class Parser {
 
         // The last clause, doesn't need to be an increment but that's what's in the book :/
         let increment: Expr | null = null;
-        if (this.check(T.RIGHT_PAREN)) {
+        if (!this.check(T.RIGHT_PAREN)) {
             increment = this.expression();
         }
+
         this.consume(T.RIGHT_PAREN, "Expect ')' after for clauses.");
 
         let body = this.statement();
@@ -139,8 +140,8 @@ export class Parser {
             } while (this.match(T.COMMA));
         }
 
-        this.consume(T.LEFT_PAREN, "Expect ')' after parameters.");
-        this.consume(T.RIGHT_BRACE, `Expect '{' before ${kind} body.`);
+        this.consume(T.RIGHT_PAREN, "Expect ')' after parameters.");
+        this.consume(T.LEFT_BRACE, `Expect '{' before ${kind} body.`);
 
         const body = this.block();
         return new Func(name, parameters, body);
