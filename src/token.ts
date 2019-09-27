@@ -1,8 +1,9 @@
 import { TokenType } from "./token-type";
+import { LoxCallable } from "./lox-callable";
 
 // Representing a Lox value in TS code. This is the same as
 // the use of `Object` in the java implementation.
-export type LoxLiteral = string | number | boolean | null;
+export type LoxLiteral = string | number | boolean | null | LoxCallable;
 
 export class Token {
     public type: TokenType;

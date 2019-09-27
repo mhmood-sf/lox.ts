@@ -84,6 +84,7 @@ function defineAst(outDir, baseName, types, imports) {
     defineAst(outDir, "Stmt", [
         "Block      : statements: Stmt[]",
         "Expression : expression: Expr",
+        "Func       : name: Token, params: Token[], body: Stmt[]",
         "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
         "Print      : expression: Expr",
         // initializer is Expr | null to stop typescript from complaining.

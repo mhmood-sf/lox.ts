@@ -1,5 +1,5 @@
 import { Token } from './token';
-import { Stmt, Print, Expression, Var, Block, If, While } from './stmt';
+import { Stmt, Print, Expression, Var, Block, If, While, Func } from './stmt';
 import { TokenTypes as T, TokenType } from './token-type';
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call } from './expr';
 import { Lox } from './lox';
@@ -123,6 +123,29 @@ export class Parser {
         return new Expression(expr);
     }
 
+    private function(kind: string) {
+        const name = this.consume(T.IDENTIFIER, `Expect ${kind} name.`);
+
+        this.consume(T.LEFT_PAREN, `Expect '(' after ${kind} name.`);
+        const parameters = [];
+
+        if (!this.check(T.RIGHT_PAREN)) {
+            do {
+                if (parameters.length >= 255) {
+                    this.error(this.peek(), "Cannot have more than 255 parameters.");
+                }
+
+                parameters.push(this.consume(T.IDENTIFIER, "Expect parameter name."));
+            } while (this.match(T.COMMA));
+        }
+
+        this.consume(T.LEFT_PAREN, "Expect ')' after parameters.");
+        this.consume(T.RIGHT_BRACE, `Expect '{' before ${kind} body.`);
+
+        const body = this.block();
+        return new Func(name, parameters, body);
+    }
+
     private block() {
         const statements: Stmt[] = [];
 
@@ -182,6 +205,7 @@ export class Parser {
 
     private declaration() {
         try {
+            if (this.match(T.FUN)) return this.function("function");
             if (this.match(T.VAR)) return this.varDeclaration();
 
             return this.statement();

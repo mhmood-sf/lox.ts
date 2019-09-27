@@ -1,8 +1,9 @@
 import { LoxLiteral, Token } from './token';
 import { RuntimeError } from './runtime-error';
+import { LoxCallable } from './lox-callable';
 
 export class Environment {
-    private values: Map<string, LoxLiteral> = new Map();
+    private values: Map<string, LoxLiteral | LoxCallable> = new Map();
     private enclosing?: Environment;
 
     public constructor(enclosing?: Environment) {
@@ -11,11 +12,11 @@ export class Environment {
         }
     }
 
-    public define(name: string, value: LoxLiteral) {
+    public define(name: string, value: LoxLiteral | LoxCallable) {
         this.values.set(name, value);
     }
 
-    public get(name: Token): LoxLiteral {
+    public get(name: Token): LoxLiteral | LoxCallable {
         const value = this.values.has(name.lexeme) ? this.values.get(name.lexeme) : undefined;
 
         if (value !== undefined) return value;

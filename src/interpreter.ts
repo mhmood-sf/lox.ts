@@ -1,11 +1,12 @@
 import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical, Call } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While } from './stmt';
+import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While, Func } from './stmt';
 import { LoxLiteral, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
 import { Environment } from './environment';
 import { Lox } from './lox';
 import { LoxCallable } from './lox-callable';
+import { LoxFunction } from './lox-function';
 
 function isLoxCallable(callee: any): callee is LoxCallable {
     return callee.call &&
@@ -15,7 +16,27 @@ function isLoxCallable(callee: any): callee is LoxCallable {
 }
 
 export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
-    private environment: Environment = new Environment();
+    public globals: Environment;
+    private environment: Environment;
+
+    public constructor() {
+        this.globals = new Environment();
+        this.environment = this.globals;
+
+        this.globals.define("clock", {
+            arity(): number {
+                return 0;
+            },
+
+            call(): LoxLiteral {
+                return Date.now();
+            },
+
+            toString() {
+                return "<native fn>";
+            }
+        });
+    }
 
     public interpret(statements: Stmt[]) {
         try {
@@ -149,7 +170,7 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         stmt.accept(this);
     }
 
-    private executeBlock(statements: Stmt[], environment: Environment) {
+    public executeBlock(statements: Stmt[], environment: Environment) {
         const { environment: previous } = this;
 
         try {
@@ -170,6 +191,11 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
 
     public visitExpressionStmt(stmt: Expression) {
         this.evaluate(stmt.expression);
+    }
+
+    public visitFuncStmt(stmt: Func) {
+        const func = new LoxFunction(stmt);
+        this.environment.define(stmt.name.lexeme, func);
     }
 
     public visitIfStmt(stmt: If) {
