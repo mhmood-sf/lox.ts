@@ -1,12 +1,14 @@
 import { Visitor as ExprVisitor, Literal, Grouping, Expr, Unary, Binary, Variable, Assign, Logical, Call } from './expr';
-import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While, Func } from './stmt';
+import { Visitor as StmtVisitor, Expression, Print, Stmt, Var, Block, If, While, Func, Return } from './stmt';
 import { LoxLiteral, Token } from './token';
 import { TokenTypes as T } from './token-type';
 import { RuntimeError } from './runtime-error';
 import { Environment } from './environment';
-import { Lox } from './lox';
 import { LoxCallable } from './lox-callable';
 import { LoxFunction } from './lox-function';
+import { ReturnException } from './return-exception';
+import { Lox } from './lox';
+
 
 function isLoxCallable(callee: any): callee is LoxCallable {
     return callee.call &&
@@ -210,6 +212,15 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     public visitPrintStmt(stmt: Print) {
         const value = this.evaluate(stmt.expression);
         console.log(value !== null ? value.toString() : 'nil');
+    }
+
+    public visitReturnStmt(stmt: Return) {
+        let value: LoxLiteral = null;
+        if (stmt.value != null) {
+            value = this.evaluate(stmt.value);
+        }
+
+        throw new ReturnException(value);
     }
 
     public visitVarStmt(stmt: Var) {

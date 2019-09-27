@@ -87,6 +87,7 @@ function defineAst(outDir, baseName, types, imports) {
         "Func       : name: Token, params: Token[], body: Stmt[]",
         "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
         "Print      : expression: Expr",
+        "Return     : keyword: Token, value: Expr | null",
         // initializer is Expr | null to stop typescript from complaining.
         "Var        : name: Token, initializer: Expr | null",
         "While      : condition: Expr, body: Stmt"

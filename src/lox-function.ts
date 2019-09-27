@@ -2,6 +2,7 @@ import { LoxCallable } from './lox-callable';
 import { Func } from './stmt';
 import { Interpreter } from './interpreter';
 import { Environment } from './environment';
+import { ReturnException } from './return-exception';
 
 export class LoxFunction implements LoxCallable {
     private declaration: Func;
@@ -21,7 +22,13 @@ export class LoxFunction implements LoxCallable {
             environment.define(this.declaration.params[x].lexeme, args[x]);
         }
 
-        interpreter.executeBlock(this.declaration.body, environment);
+        try {
+            interpreter.executeBlock(this.declaration.body, environment);
+        } catch (err) {
+            if (err instanceof ReturnException) {
+                return err.value;
+            }
+        }
         return null;
     }
 
