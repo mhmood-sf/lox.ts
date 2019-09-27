@@ -14,7 +14,9 @@ function isLoxCallable(callee: any): callee is LoxCallable {
     return callee.call &&
     (typeof callee.call === 'function') &&
     callee.arity &&
-    (typeof callee.arity === 'function');
+    (typeof callee.arity === 'function') &&
+    callee.toString &&
+    (typeof callee.toString === 'function');
 }
 
 export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
