@@ -7,9 +7,7 @@ export class Environment {
     private enclosing?: Environment;
 
     public constructor(enclosing?: Environment) {
-        if (enclosing) {
-            this.enclosing = enclosing;
-        }
+        if (enclosing) this.enclosing = enclosing;
     }
 
     public define(name: string, value: LoxLiteral | LoxCallable) {

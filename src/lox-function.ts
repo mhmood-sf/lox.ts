@@ -6,9 +6,11 @@ import { ReturnException } from './return-exception';
 
 export class LoxFunction implements LoxCallable {
     private declaration: Func;
+    private closure: Environment;
 
-    public constructor(declaration: Func) {
+    public constructor(declaration: Func, closure: Environment) {
         this.declaration = declaration;
+        this.closure = closure;
     }
 
     public arity() {
@@ -16,7 +18,7 @@ export class LoxFunction implements LoxCallable {
     }
 
     public call(interpreter: Interpreter, args: any[]) {
-        const environment = new Environment(interpreter.globals);
+        const environment = new Environment(this.closure);
         
         for (let x = 0; x < this.declaration.params.length; x++) {
             environment.define(this.declaration.params[x].lexeme, args[x]);
