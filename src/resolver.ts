@@ -10,7 +10,9 @@ import {
     Call,
     Grouping,
     Logical,
-    Unary
+    Unary,
+    Getter,
+    Setter
 } from "./expr";
 import {
     Visitor as StmtVisitor,
@@ -93,6 +95,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         }
     }
 
+    public visitGetterExpr(expr: Getter) {
+        this.resolve(expr.obj);
+    }
+
     public visitGroupingExpr(expr: Grouping) {
         this.resolve(expr.expression);
     }
@@ -102,6 +108,11 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     public visitLogicalExpr(expr: Logical) {
         this.resolve(expr.left);
         this.resolve(expr.right);
+    }
+
+    public visitSetterExpr(expr: Setter) {
+        this.resolve(expr.val);
+        this.resolve(expr.obj);
     }
 
     public visitUnaryExpr(expr: Unary) {

@@ -16,7 +16,9 @@ import {
     Variable,
     Assign,
     Logical,
-    Call
+    Call,
+    Getter,
+    Setter
 } from './expr';
 import {
     Visitor as StmtVisitor,
@@ -31,6 +33,7 @@ import {
     Return,
     Class
 } from './stmt';
+import { LoxInstance } from './lox-instance';
 
 function isLoxCallable(callee: any): callee is LoxCallable {
     return callee.call &&
@@ -89,6 +92,18 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         }
 
         return this.evaluate(expr.right);
+    }
+
+    public visitSetterExpr(expr: Setter) {
+        const obj = this.evaluate(expr.obj);
+
+        if (!(obj instanceof LoxInstance)) {
+            throw new RuntimeError(expr.name, "Only instances have fields.");
+        }
+
+        const val = this.evaluate(expr.val);
+        obj.set(expr.name, val);
+        return val;
     }
 
     public visitGroupingExpr(expr: Grouping) {
@@ -188,6 +203,16 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         }
 
         return fn.call(this, args);
+    }
+
+    public visitGetterExpr(expr: Getter) {
+        const obj = this.evaluate(expr.obj);
+
+        if (obj instanceof LoxInstance) {
+            return obj.get(expr.name);
+        }
+
+        throw new RuntimeError(expr.name, "Only instances have properties.");
     }
 
     private checkNumberOperands(operator: Token, ...operands: LoxLiteral[]) {

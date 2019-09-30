@@ -1,7 +1,7 @@
 import { Token } from './token';
 import { Stmt, Print, Expression, Var, Block, If, While, Func, Return, Class } from './stmt';
 import { TokenType } from './token-type';
-import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call } from './expr';
+import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call, Getter, Setter } from './expr';
 import { Lox } from './lox';
 
 export class Parser {
@@ -180,6 +180,9 @@ export class Parser {
             if (expr instanceof Variable) {
                 const name = expr.name;
                 return new Assign(name, value);
+            } else if (expr instanceof Getter) {
+                const get = expr;
+                return new Setter(get.obj, get.name, value);
             }
 
             this.error(equals, "Invalid assignment target.");
@@ -308,6 +311,9 @@ export class Parser {
         while (true) {
             if (this.match('LEFT_PAREN')) {
                 expr = this.finishCall(expr);
+            } else if (this.match('DOT')) {
+                const name = this.consume('IDENTIFIER', "Expect property name after '.'.");
+                expr = new Getter(expr, name);
             } else {
                 break;
             }

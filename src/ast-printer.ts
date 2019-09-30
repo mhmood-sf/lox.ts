@@ -9,7 +9,9 @@ import {
     Variable,
     Assign,
     Logical,
-    Call
+    Call,
+    Setter,
+    Getter
 } from './expr';
 
 export class AstPrinter implements Visitor<string> {
@@ -19,6 +21,14 @@ export class AstPrinter implements Visitor<string> {
 
     public visitCallExpr(expr: Call) {
         return this.parenthesize(expr.paren.lexeme, expr.callee, ...expr.args);
+    }
+
+    public visitSetterExpr(expr: Setter) {
+        return this.parenthesize(expr.name.lexeme, expr.obj, expr.val);
+    }
+
+    public visitGetterExpr(expr: Getter) {
+        return this.parenthesize(expr.name.lexeme, expr.obj);
     }
 
     public visitBinaryExpr(expr: Binary) {
