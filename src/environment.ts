@@ -24,11 +24,44 @@ export class Environment {
         else throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
     }
 
+    // Takes name: Token instead of name: string like in the book
+    // so that I can throw a RuntimeError instead of a normal Error
+    // for consistency.
+    public getAt(distance: number, name: Token) {
+        const ancestor = this.ancestor(distance);
+        if (ancestor) {
+            const val = ancestor.values.get(name.lexeme);
+            return val !== undefined ? val : null;
+        } else {
+            // Ignore this part, it'll probably never execute.
+            // Probably. :v
+            throw new RuntimeError(name, `Cannot access unresolved variable '${name.lexeme}'.`);
+        }
+    }
+
+    private ancestor(distance: number) {
+        let environment: Environment | undefined = this;
+        for (let i = 0; i < distance; i++) {
+            environment = environment && environment.enclosing;
+        }
+        return environment;
+    }
+
     public assign(name: Token, value: LoxLiteral) {
         if (this.values.has(name.lexeme)) this.values.set(name.lexeme, value);
 
         else if (this.enclosing) this.enclosing.assign(name, value);
 
         else throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
+    }
+
+    public assignAt(distance: number, name: Token, value: LoxLiteral) {
+        const ancestor = this.ancestor(distance);
+        if (ancestor) {
+            ancestor.values.set(name.lexeme, value);
+        } else {
+            // Again, ignore. :v
+            throw new Error(`Cannot access unresolved variable '${name.lexeme}'.`);
+        }
     }
 }

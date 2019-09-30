@@ -43,6 +43,7 @@ function isLoxCallable(callee: any): callee is LoxCallable {
 export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     public globals: Environment;
     private environment: Environment;
+    private locals: Map<Expr, number> = new Map();
 
     public constructor() {
         this.globals = new Environment();
@@ -109,7 +110,16 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     }
 
     public visitVariableExpr(expr: Variable) {
-        return this.environment.get(expr.name);
+        return this.lookupVariable(expr.name, expr);
+    }
+
+    private lookupVariable(name: Token, expr: Expr) {
+        const distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            return this.environment.getAt(distance, name);
+        } else {
+            return this.globals.get(name);
+        }
     }
 
     public visitBinaryExpr(expr: Binary) {
@@ -195,6 +205,10 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         stmt.accept(this);
     }
 
+    public resolve(expr: Expr, depth: number) {
+        this.locals.set(expr, depth);
+    }
+
     public executeBlock(statements: Stmt[], environment: Environment) {
         const { environment: previous } = this;
 
@@ -266,7 +280,13 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     public visitAssignExpr(expr: Assign) {
         const value = this.evaluate(expr.value);
 
-        this.environment.assign(expr.name, value);
+        const distance = this.locals.get(expr);
+        if (distance !== undefined) {
+            this.environment.assignAt(distance, expr.name, value);
+        } else {
+            this.globals.assign(expr.name, value);
+        }
+
         return value;
     }
 

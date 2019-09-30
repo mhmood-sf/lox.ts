@@ -7,6 +7,7 @@ import { Parser } from './parser';
 // import { AstPrinter } from "./ast-printer";
 import { RuntimeError } from "./runtime-error";
 import { Interpreter } from "./interpreter";
+import { Resolver } from "./resolver";
 
 export class Lox {
     private static interpreter = new Interpreter();
@@ -57,8 +58,13 @@ export class Lox {
 
         if (statements === null) {
             console.log("Program terminated due to error!");
-        }
-        else {
+        } else {
+            const resolver = new Resolver(this.interpreter);
+            resolver.resolve(...statements);
+
+            // Stop if there were any resolution errors.
+            if (this.hadError) return;
+
             this.interpreter.interpret(statements);
         }
 

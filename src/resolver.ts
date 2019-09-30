@@ -28,9 +28,12 @@ type visitable = {
     accept: (visitor: any) => any;
 }
 
+type FunctionType = 'NONE' | 'FUNCTION';
+
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     private interpreter: Interpreter;
     private scopes: Array<Map<string, boolean>> = [];
+    private currentFunction: FunctionType = 'NONE';
 
     public constructor(interpreter: Interpreter) {
         this.interpreter = interpreter;
@@ -57,6 +60,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     }
 
     public visitReturnStmt(stmt: Return) {
+        if (this.currentFunction === 'NONE') {
+            Lox.error(stmt.keyword, "Cannot return from top-level code.");
+        }
+        
         if (stmt.value != null) {
             this.resolve(stmt.value);
         }
@@ -99,7 +106,7 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         this.declare(stmt.name);
         this.define(stmt.name);
 
-        this.resolveFunction(stmt);
+        this.resolveFunction(stmt, 'FUNCTION');
     }
 
     public visitVarStmt(stmt: Var) {
@@ -117,9 +124,9 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
 
     public visitVariableExpr(expr: Variable) {
         // Don't mind this
-        const a = this.scopes.length !== 0;
-        const b = this.scopes[this.scopes.length - 1].get(expr.name.lexeme) === false;
-        if (a && b) {
+        const ln = this.scopes.length;
+        const cond = (ln !== 0) && this.scopes[ln - 1].get(expr.name.lexeme) === false;
+        if (cond) {
             Lox.error(expr.name, "Cannot read local variable in its own initializer.");
         }
 
@@ -132,7 +139,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         }
     }
 
-    private resolveFunction(func: Func) {
+    private resolveFunction(func: Func, type: FunctionType) {
+        const enclosingFunction = this.currentFunction;
+        this.currentFunction = type;
+
         this.beginScope();
         for (const param of func.params) {
             this.declare(param);
@@ -140,6 +150,8 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         }
         this.resolve(...func.body);
         this.endScope();
+
+        this.currentFunction = enclosingFunction;
     }
 
     private beginScope() {
@@ -154,6 +166,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         if (this.scopes.length === 0) return;
 
         const scope = this.scopes[this.scopes.length - 1];
+        if (scope.has(name.lexeme)) {
+            Lox.error(name, "Variable with this name already declared in this scope.");
+        }
+
         scope.set(name.lexeme, false);
     }
 
