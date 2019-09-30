@@ -3,6 +3,7 @@ import { Func } from './stmt';
 import { Interpreter } from './interpreter';
 import { Environment } from './environment';
 import { ReturnException } from './return-exception';
+import { LoxInstance } from './lox-instance';
 
 export class LoxFunction implements LoxCallable {
     private declaration: Func;
@@ -11,6 +12,12 @@ export class LoxFunction implements LoxCallable {
     public constructor(declaration: Func, closure: Environment) {
         this.declaration = declaration;
         this.closure = closure;
+    }
+
+    public bind(instance: LoxInstance) {
+        const environment = new Environment(this.closure);
+        environment.define("this", instance);
+        return new LoxFunction(this.declaration, environment);
     }
 
     public arity() {

@@ -18,7 +18,8 @@ import {
     Logical,
     Call,
     Getter,
-    Setter
+    Setter,
+    This
 } from './expr';
 import {
     Visitor as StmtVisitor,
@@ -104,6 +105,10 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         const val = this.evaluate(expr.val);
         obj.set(expr.name, val);
         return val;
+    }
+
+    public visitThisExpr(expr: This) {
+        return this.lookupVariable(expr.keyword, expr);
     }
 
     public visitGroupingExpr(expr: Grouping) {

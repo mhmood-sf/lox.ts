@@ -79,6 +79,7 @@ function defineAst(outDir, baseName, types, imports) {
         "Literal  : value: LoxLiteral",
         "Logical  : left: Expr, operator: Token, right: Expr",
         "Setter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
+        "This     : keyword: Token", 
         "Unary    : operator: Token, right: Expr",
         "Variable : name: Token"
     ], 'import { Token, LoxLiteral } from "./token"');

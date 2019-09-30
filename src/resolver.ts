@@ -12,7 +12,8 @@ import {
     Logical,
     Unary,
     Getter,
-    Setter
+    Setter,
+    This
 } from "./expr";
 import {
     Visitor as StmtVisitor,
@@ -27,16 +28,16 @@ import {
     Class
 } from "./stmt";
 
-type visitable = {
-    accept: (visitor: any) => any;
-}
+type visitable = { accept: (visitor: any) => any; }
 
 type FunctionType = 'NONE' | 'FUNCTION' | 'METHOD';
+type ClassType = 'NONE' | 'CLASS';
 
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     private interpreter: Interpreter;
     private scopes: Array<Map<string, boolean>> = [];
     private currentFunction: FunctionType = 'NONE';
+    private currentClass: ClassType = 'NONE';
 
     public constructor(interpreter: Interpreter) {
         this.interpreter = interpreter;
@@ -49,13 +50,22 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     }
 
     public visitClassStmt(stmt: Class) {
+        const enclosingClass = this.currentClass;
+        this.currentClass = 'CLASS';
+
         this.declare(stmt.name);
         this.define(stmt.name);
+
+        this.beginScope();
+        this.scopes[this.scopes.length - 1].set("this", true);
 
         for (const method of stmt.methods) {
             const declaration: FunctionType = 'METHOD';
             this.resolveFunction(method, declaration);
         }
+
+        this.endScope();
+        this.currentClass = enclosingClass;
     }
 
     public visitExpressionStmt(stmt: Expression) {
@@ -118,6 +128,15 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     public visitSetterExpr(expr: Setter) {
         this.resolve(expr.val);
         this.resolve(expr.obj);
+    }
+
+    public visitThisExpr(expr: This) {
+        if (this.currentClass === 'NONE') {
+            Lox.error(expr.keyword, "Cannot use 'this' outside of a class.");
+            return;
+        }
+
+        this.resolveLocal(expr, expr.keyword);
     }
 
     public visitUnaryExpr(expr: Unary) {

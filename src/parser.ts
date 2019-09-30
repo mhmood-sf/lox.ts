@@ -1,7 +1,7 @@
 import { Token } from './token';
 import { Stmt, Print, Expression, Var, Block, If, While, Func, Return, Class } from './stmt';
 import { TokenType } from './token-type';
-import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call, Getter, Setter } from './expr';
+import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call, Getter, Setter, This } from './expr';
 import { Lox } from './lox';
 
 export class Parser {
@@ -346,6 +346,10 @@ export class Parser {
 
         if (this.match('NUMBER', 'STRING')) {
             return new Literal(this.previous().literal);
+        }
+
+        if (this.match('THIS')) {
+            return new This(this.previous());
         }
 
         if (this.match('IDENTIFIER')) {
