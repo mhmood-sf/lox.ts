@@ -83,6 +83,7 @@ function defineAst(outDir, baseName, types, imports) {
 
     defineAst(outDir, "Stmt", [
         "Block      : statements: Stmt[]",
+        "Class      : name: Token, methods: Func[]",
         "Expression : expression: Expr",
         "Func       : name: Token, params: Token[], body: Stmt[]",
         "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",

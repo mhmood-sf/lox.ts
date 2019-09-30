@@ -21,7 +21,8 @@ import {
     If,
     Print,
     Return,
-    While
+    While,
+    Class
 } from "./stmt";
 
 type visitable = {
@@ -43,6 +44,11 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         this.beginScope();
         this.resolve(...stmt.statements);
         this.endScope();
+    }
+
+    public visitClassStmt(stmt: Class) {
+        this.declare(stmt.name);
+        this.define(stmt.name);
     }
 
     public visitExpressionStmt(stmt: Expression) {

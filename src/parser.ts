@@ -1,5 +1,5 @@
 import { Token } from './token';
-import { Stmt, Print, Expression, Var, Block, If, While, Func, Return } from './stmt';
+import { Stmt, Print, Expression, Var, Block, If, While, Func, Return, Class } from './stmt';
 import { TokenType } from './token-type';
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call } from './expr';
 import { Lox } from './lox';
@@ -218,6 +218,7 @@ export class Parser {
 
     private declaration() {
         try {
+            if (this.match('CLASS')) return this.classDeclaration();
             if (this.match('FUN')) return this.function("function");
             if (this.match('VAR')) return this.varDeclaration();
 
@@ -227,6 +228,20 @@ export class Parser {
             // Stmt[] does not accept null.
             return new Expression(new Literal(null));
         }
+    }
+
+    private classDeclaration() {
+        const name = this.consume('IDENTIFIER', "Expect class name.");
+        this.consume('LEFT_BRACE', "Expect '{' before class body.");
+
+        const methods = [];
+        while (!this.check('RIGHT_BRACE') && !this.isAtEnd()) {
+            methods.push(this.function('method'));
+        }
+
+        this.consume('RIGHT_BRACE', "Expect '}' after class body.");
+
+        return new Class(name, methods);
     }
 
     private equality() {

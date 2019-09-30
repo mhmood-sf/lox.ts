@@ -1,5 +1,5 @@
 import { LoxLiteral, Token } from './token';
-import { TokenType } from './token-type';
+import { LoxClass } from './lox-class';
 import { RuntimeError } from './runtime-error';
 import { Environment } from './environment';
 import { LoxCallable } from './lox-callable';
@@ -28,7 +28,8 @@ import {
     If,
     While,
     Func,
-    Return
+    Return,
+    Class
 } from './stmt';
 
 function isLoxCallable(callee: any): callee is LoxCallable {
@@ -226,6 +227,12 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     public visitBlockStmt(stmt: Block) {
         this.executeBlock(stmt.statements, new Environment(this.environment));
         return null;
+    }
+
+    public visitClassStmt(stmt: Class) {
+        this.environment.define(stmt.name.lexeme, null);
+        const _class = new LoxClass(stmt.name.lexeme);
+        this.environment.assign(stmt.name, _class);
     }
 
     public visitExpressionStmt(stmt: Expression) {
