@@ -1,4 +1,3 @@
-// import { TokenTypes } from './token-type';
 // import { Token } from './token';
 import {
     Visitor,
@@ -73,10 +72,10 @@ export class AstPrinter implements Visitor<string> {
 (function main() {
     const expression: Expr = new Binary(
         new Unary(
-            new Token(TokenTypes.MINUS, "-", null, 1),
+            new Token('MINUS', "-", null, 1),
             new Literal(123)
         ),
-        new Token(TokenTypes.STAR, "*", null, 1),
+        new Token('STAR', "*", null, 1),
         new Grouping(
             new Literal(456.789)
         )

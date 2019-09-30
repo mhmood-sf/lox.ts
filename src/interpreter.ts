@@ -1,5 +1,5 @@
 import { LoxLiteral, Token } from './token';
-import { TokenTypes as T } from './token-type';
+import { TokenType } from './token-type';
 import { RuntimeError } from './runtime-error';
 import { Environment } from './environment';
 import { LoxCallable } from './lox-callable';
@@ -81,7 +81,7 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     public visitLogicalExpr(expr: Logical) {
         const left = this.evaluate(expr.left);
 
-        if (expr.operator.type === T.OR) {
+        if (expr.operator.type === 'OR') {
             if (this.isTruthy(left)) return left;
         } else {
             if (!this.isTruthy(left)) return left;
@@ -99,10 +99,10 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         const rightStr = rightRaw !== null ? rightRaw.toString() : "null";
 
         switch (expr.operator.type) {
-            case T.MINUS:
+            case 'MINUS':
                 this.checkNumberOperands(expr.operator, rightRaw);
                 return -(parseFloat(rightStr));
-            case T.BANG:
+            case 'BANG':
                 return !(this.isTruthy(rightRaw));
         }
 
@@ -127,28 +127,28 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         const right = this.evaluate(expr.right);
 
         switch (expr.operator.type) {
-            case T.GREATER:
+            case 'GREATER':
                 this.checkNumberOperands(expr.operator, left, right);
                 return left! > right!;
-            case T.GREATER_EQUAL:
+            case 'GREATER_EQUAL':
                 this.checkNumberOperands(expr.operator, left, right);
                 return left! >= right!;
-            case T.LESS:
+            case 'LESS':
                 this.checkNumberOperands(expr.operator, left, right);
                 return left! < right!;
-            case T.LESS_EQUAL:
+            case 'LESS_EQUAL':
                 this.checkNumberOperands(expr.operator, left, right);
                 return left! <= right!;
-            case T.BANG_EQUAL:
+            case 'BANG_EQUAL':
                 this.checkNumberOperands(expr.operator, left, right);
                 return !this.isEqual(left, right);
-            case T.EQUAL_EQUAL:
+            case 'EQUAL_EQUAL':
                 this.checkNumberOperands(expr.operator, left, right);
                 return this.isEqual(left, right)
-            case T.MINUS:
+            case 'MINUS':
                 this.checkNumberOperands(expr.operator, left, right);
                 return (left as any) - (right as any);
-            case T.PLUS:
+            case 'PLUS':
                 if (typeof left === 'number' && typeof right === 'number') {
                     return left + right;
                 }
@@ -158,10 +158,10 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
                 }
 
                 throw new RuntimeError(expr.operator, "Operands must be strings or numbers");
-            case T.SLASH:
+            case 'SLASH':
                 this.checkNumberOperands(expr.operator, left, right);
                 return (left as any) / (right as any);
-            case T.STAR:
+            case 'STAR':
                 this.checkNumberOperands(expr.operator, left, right);
                 return (left as any) * (right as any);
         }

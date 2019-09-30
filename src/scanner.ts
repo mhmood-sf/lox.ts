@@ -1,4 +1,4 @@
-import { TokenType, TokenTypes, Keywords } from "./token-type";
+import { TokenType, Keywords } from "./token-type";
 import { Token, LoxLiteral } from "./token";
 import { Lox } from "./lox";
 
@@ -19,40 +19,39 @@ export class Scanner {
             this.scanToken();
         }
 
-        this.tokens.push(new Token(TokenTypes.EOF, "[EOF]", null, this.line));
+        this.tokens.push(new Token('EOF', "[EOF]", null, this.line));
 
         return this.tokens;
     }
 
     private scanToken() {
         const c = this.advance();
-        const T = TokenTypes;
 
         switch (c) {
             // Single char tokens
-            case '(': this.addToken(T.LEFT_PAREN); break;
-            case ')': this.addToken(T.RIGHT_PAREN); break;
-            case '{': this.addToken(T.LEFT_BRACE); break;
-            case '}': this.addToken(T.RIGHT_BRACE); break;
-            case ',': this.addToken(T.COMMA); break;
-            case '.': this.addToken(T.DOT); break;
-            case '-': this.addToken(T.MINUS); break;
-            case '+': this.addToken(T.PLUS); break;
-            case ';': this.addToken(T.SEMICOLON); break;
-            case '*': this.addToken(T.STAR); break;
+            case '(': this.addToken('LEFT_PAREN'); break;
+            case ')': this.addToken('RIGHT_PAREN'); break;
+            case '{': this.addToken('LEFT_BRACE'); break;
+            case '}': this.addToken('RIGHT_BRACE'); break;
+            case ',': this.addToken('COMMA'); break;
+            case '.': this.addToken('DOT'); break;
+            case '-': this.addToken('MINUS'); break;
+            case '+': this.addToken('PLUS'); break;
+            case ';': this.addToken('SEMICOLON'); break;
+            case '*': this.addToken('STAR'); break;
 
             // Single or double char tokens
             case '!':
-                this.addToken(this.match('=') ? T.BANG_EQUAL : T.BANG);
+                this.addToken(this.match('=') ? 'BANG_EQUAL' : 'BANG');
                 break;
             case '=':
-                this.addToken(this.match('=') ? T.EQUAL_EQUAL : T.EQUAL);
+                this.addToken(this.match('=') ? 'EQUAL_EQUAL' : 'EQUAL');
                 break;
             case '<':
-                this.addToken(this.match('=') ? T.LESS_EQUAL : T.LESS);
+                this.addToken(this.match('=') ? 'LESS_EQUAL' : 'LESS');
                 break;
             case '>':
-                this.addToken(this.match('=') ? T.GREATER_EQUAL : T.GREATER);
+                this.addToken(this.match('=') ? 'GREATER_EQUAL' : 'GREATER');
                 break;
             case '/':
                 if (this.match('/')) {
@@ -60,7 +59,7 @@ export class Scanner {
                         this.advance();
                     }
                 } else {
-                    this.addToken(T.SLASH);
+                    this.addToken('SLASH');
                 }
                 break;
 
@@ -95,7 +94,7 @@ export class Scanner {
 
         const lexeme = this.source.substring(this.start, this.current);
 
-        const type: TokenType = Keywords[lexeme] || TokenTypes.IDENTIFIER;
+        const type: TokenType = Keywords[lexeme] || 'IDENTIFIER';
         this.addToken(type);
     }
 
@@ -116,7 +115,7 @@ export class Scanner {
         }
 
         const val = parseFloat(this.source.substring(this.start, this.current));
-        this.addToken(TokenTypes.NUMBER, val);
+        this.addToken('NUMBER', val);
     }
 
     private handleString() {
@@ -133,7 +132,7 @@ export class Scanner {
             this.advance();
 
             const val = this.source.substring(this.start + 1, this.current - 1);
-            this.addToken(TokenTypes.STRING, val);
+            this.addToken('STRING', val);
         }
     }
 

@@ -30,29 +30,3 @@ export const Keywords: {[k: string]: TokenType} = {
     var: 'VAR',
     while: 'WHILE'
 };
-
-export const TokenTypes = makeEnum([
-  // Single-character tokens.
-  'LEFT_PAREN', 'RIGHT_PAREN', 'LEFT_BRACE', 'RIGHT_BRACE',
-  'COMMA', 'DOT', 'MINUS', 'PLUS', 'SEMICOLON', 'SLASH', 'STAR',
-
-  // One or two character tokens.
-  'BANG', 'BANG_EQUAL', 'EQUAL', 'EQUAL_EQUAL',
-  'GREATER', 'GREATER_EQUAL', 'LESS', 'LESS_EQUAL',
-
-  // Literals.
-  'IDENTIFIER', 'STRING', 'NUMBER',
-
-  // Keywords.
-  'AND', 'CLASS', 'ELSE', 'FALSE', 'FUN', 'FOR', 'IF', 'NIL', 'OR',
-  'PRINT', 'RETURN', 'SUPER', 'THIS', 'TRUE', 'VAR', 'WHILE',
-
-  'EOF'
-]);
-
-// Creates a js object from a string[] where each key === value.
-function makeEnum(vars: TokenType[]): {[k: string]: TokenType } {
-    const e: {[k: string]: TokenType } = {};
-    for (const v of vars) e[v] = v;
-    return e;
-}

@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as readline from "readline";
 import { Scanner } from "./scanner";
 import { Token } from "./token";
-import { TokenTypes } from "./token-type";
 import { Parser } from './parser';
 // import { AstPrinter } from "./ast-printer";
 import { RuntimeError } from "./runtime-error";
@@ -75,7 +74,7 @@ export class Lox {
         if (typeof token === 'number') {
             this.report(token, "", message);
         } else {
-            if (token.type === TokenTypes.EOF) {
+            if (token.type === 'EOF') {
                 this.report(token.line, " at end", message);
             } else {
                 this.report(token.line, ` at '${token.lexeme}'`, message);

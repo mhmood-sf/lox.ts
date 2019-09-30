@@ -1,6 +1,6 @@
 import { Token } from './token';
 import { Stmt, Print, Expression, Var, Block, If, While, Func, Return } from './stmt';
-import { TokenTypes as T, TokenType } from './token-type';
+import { TokenType } from './token-type';
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call } from './expr';
 import { Lox } from './lox';
 
@@ -27,41 +27,41 @@ export class Parser {
     }
 
     private statement(): Stmt {
-        if (this.match(T.PRINT)) return this.printStatement();
-        if (this.match(T.RETURN)) return this.returnStatement();
-        if (this.match(T.WHILE)) return this.whileStatement();
-        if (this.match(T.LEFT_BRACE)) return new Block(this.block());
-        if (this.match(T.IF)) return this.ifStatement();
-        if (this.match(T.FOR)) return this.forStatement();
+        if (this.match('PRINT')) return this.printStatement();
+        if (this.match('RETURN')) return this.returnStatement();
+        if (this.match('WHILE')) return this.whileStatement();
+        if (this.match('LEFT_BRACE')) return new Block(this.block());
+        if (this.match('IF')) return this.ifStatement();
+        if (this.match('FOR')) return this.forStatement();
 
         return this.expressionStatement();
     }
 
     private forStatement() {
-        this.consume(T.LEFT_PAREN, "Expect '(' after 'for'.");
+        this.consume('LEFT_PAREN', "Expect '(' after 'for'.");
 
         let initializer: Stmt | null = null;
-        if (this.match(T.SEMICOLON)) {
+        if (this.match('SEMICOLON')) {
             initializer = null;
-        } else if (this.match(T.VAR)) {
+        } else if (this.match('VAR')) {
             initializer = this.varDeclaration();
         } else {
             initializer = this.expressionStatement();
         }
 
         let condition: Expr | null = null;
-        if (!this.check(T.SEMICOLON)) {
+        if (!this.check('SEMICOLON')) {
             condition = this.expression();
         }
-        this.consume(T.SEMICOLON, "Expect ';' after loop condition.");
+        this.consume('SEMICOLON', "Expect ';' after loop condition.");
 
         // The last clause, doesn't need to be an increment but that's what's in the book :/
         let increment: Expr | null = null;
-        if (!this.check(T.RIGHT_PAREN)) {
+        if (!this.check('RIGHT_PAREN')) {
             increment = this.expression();
         }
 
-        this.consume(T.RIGHT_PAREN, "Expect ')' after for clauses.");
+        this.consume('RIGHT_PAREN', "Expect ')' after for clauses.");
 
         let body = this.statement();
         if (increment != null) {
@@ -79,13 +79,13 @@ export class Parser {
     }
 
     private ifStatement() {
-        this.consume(T.LEFT_PAREN, "Expect '(' after 'if'.");
+        this.consume('LEFT_PAREN', "Expect '(' after 'if'.");
         const condition = this.expression();
-        this.consume(T.RIGHT_PAREN, "Expect ')' after 'if' condition.");
+        this.consume('RIGHT_PAREN', "Expect ')' after 'if' condition.");
 
         const thenBranch = this.statement();
         let elseBranch: Stmt | null = null;
-        if (this.match(T.ELSE)) {
+        if (this.match('ELSE')) {
             elseBranch = this.statement();
         }
 
@@ -94,37 +94,37 @@ export class Parser {
 
     private printStatement() {
         const value = this.expression();
-        this.consume(T.SEMICOLON, "Expect ';' after expression.");
+        this.consume('SEMICOLON', "Expect ';' after expression.");
         return new Print(value);
     }
 
     private returnStatement() {
         const keyword = this.previous();
         let value: Expr | null = null;
-        if (!this.check(T.SEMICOLON)) {
+        if (!this.check('SEMICOLON')) {
             value = this.expression();
         }
 
-        this.consume(T.SEMICOLON, "Expect ';' after return value.");
+        this.consume('SEMICOLON', "Expect ';' after return value.");
         return new Return(keyword, value);
     }
 
     private varDeclaration() {
-        const name = this.consume(T.IDENTIFIER, "Expect variable name.");
+        const name = this.consume('IDENTIFIER', "Expect variable name.");
 
         let initializer: Expr | null = null;
-        if (this.match(T.EQUAL)) {
+        if (this.match('EQUAL')) {
             initializer = this.expression();
         }
 
-        this.consume(T.SEMICOLON, "Expect ';' after variable declaration.");
+        this.consume('SEMICOLON', "Expect ';' after variable declaration.");
         return new Var(name, initializer);
     }
 
     private whileStatement() {
-        this.consume(T.LEFT_PAREN, "Expect '(' after 'while'.");
+        this.consume('LEFT_PAREN', "Expect '(' after 'while'.");
         const condition = this.expression();
-        this.consume(T.RIGHT_PAREN, "Expect ')' after condition.");
+        this.consume('RIGHT_PAREN', "Expect ')' after condition.");
         const body = this.statement();
 
         return new While(condition, body);
@@ -132,28 +132,28 @@ export class Parser {
 
     private expressionStatement() {
         const expr = this.expression();
-        this.consume(T.SEMICOLON, "Expect ';' after expression.");
+        this.consume('SEMICOLON', "Expect ';' after expression.");
         return new Expression(expr);
     }
 
     private function(kind: string) {
-        const name = this.consume(T.IDENTIFIER, `Expect ${kind} name.`);
+        const name = this.consume('IDENTIFIER', `Expect ${kind} name.`);
 
-        this.consume(T.LEFT_PAREN, `Expect '(' after ${kind} name.`);
+        this.consume('LEFT_PAREN', `Expect '(' after ${kind} name.`);
         const parameters = [];
 
-        if (!this.check(T.RIGHT_PAREN)) {
+        if (!this.check('RIGHT_PAREN')) {
             do {
                 if (parameters.length >= 255) {
                     this.error(this.peek(), "Cannot have more than 255 parameters.");
                 }
 
-                parameters.push(this.consume(T.IDENTIFIER, "Expect parameter name."));
-            } while (this.match(T.COMMA));
+                parameters.push(this.consume('IDENTIFIER', "Expect parameter name."));
+            } while (this.match('COMMA'));
         }
 
-        this.consume(T.RIGHT_PAREN, "Expect ')' after parameters.");
-        this.consume(T.LEFT_BRACE, `Expect '{' before ${kind} body.`);
+        this.consume('RIGHT_PAREN', "Expect ')' after parameters.");
+        this.consume('LEFT_BRACE', `Expect '{' before ${kind} body.`);
 
         const body = this.block();
         return new Func(name, parameters, body);
@@ -162,18 +162,18 @@ export class Parser {
     private block() {
         const statements: Stmt[] = [];
 
-        while (!this.check(T.RIGHT_BRACE) && !this.isAtEnd()) {
+        while (!this.check('RIGHT_BRACE') && !this.isAtEnd()) {
             statements.push(this.declaration());
         }
 
-        this.consume(T.RIGHT_BRACE, "Expect '}' after block.");
+        this.consume('RIGHT_BRACE', "Expect '}' after block.");
         return statements;
     }
 
     private assignment(): Expr {
         const expr = this.or();
 
-        if (this.match(T.EQUAL)) {
+        if (this.match('EQUAL')) {
             const equals = this.previous();
             const value = this.assignment();
 
@@ -191,7 +191,7 @@ export class Parser {
     private or() {
         let expr = this.and();
 
-        while (this.match(T.OR)) {
+        while (this.match('OR')) {
             const operator = this.previous();
             const right = this.and();
             expr = new Logical(expr, operator, right);
@@ -203,7 +203,7 @@ export class Parser {
     private and() {
         let expr = this.equality();
 
-        while (this.match(T.AND)) {
+        while (this.match('AND')) {
             const operator = this.previous();
             const right = this.equality();
             expr = new Logical(expr, operator, right);
@@ -218,8 +218,8 @@ export class Parser {
 
     private declaration() {
         try {
-            if (this.match(T.FUN)) return this.function("function");
-            if (this.match(T.VAR)) return this.varDeclaration();
+            if (this.match('FUN')) return this.function("function");
+            if (this.match('VAR')) return this.varDeclaration();
 
             return this.statement();
         } catch (err) {
@@ -232,7 +232,7 @@ export class Parser {
     private equality() {
         let expr = this.comparison();
 
-        while (this.match(T.BANG_EQUAL, T.EQUAL_EQUAL)) {
+        while (this.match('BANG_EQUAL', 'EQUAL_EQUAL')) {
             const operator = this.previous();
             const right = this.comparison();
             expr = new Binary(expr, operator, right);
@@ -244,7 +244,7 @@ export class Parser {
     private comparison() {
         let expr = this.addition();
 
-        while (this.match(T.GREATER, T.GREATER_EQUAL, T.LESS, T.LESS_EQUAL)) {
+        while (this.match('GREATER', 'GREATER_EQUAL', 'LESS', 'LESS_EQUAL')) {
             const operator = this.previous();
             const right = this.addition();
             expr = new Binary(expr, operator, right)
@@ -256,7 +256,7 @@ export class Parser {
     private addition() {
         let expr = this.multiplication();
 
-        while (this.match(T.MINUS, T.PLUS)) {
+        while (this.match('MINUS', 'PLUS')) {
             const operator = this.previous();
             const right = this.multiplication();
             expr = new Binary(expr, operator, right);
@@ -268,7 +268,7 @@ export class Parser {
     private multiplication() {
         let expr = this.unary();
 
-        while (this.match(T.SLASH, T.STAR)) {
+        while (this.match('SLASH', 'STAR')) {
             const operator = this.previous();
             const right = this.unary();
             expr = new Binary(expr, operator, right);
@@ -278,7 +278,7 @@ export class Parser {
     }
 
     private unary(): Expr {
-        if (this.match(T.BANG, T.MINUS)) {
+        if (this.match('BANG', 'MINUS')) {
             const operator = this.previous();
             const right = this.unary();
             return new Unary(operator, right);
@@ -291,7 +291,7 @@ export class Parser {
         let expr: Expr = this.primary();
 
         while (true) {
-            if (this.match(T.LEFT_PAREN)) {
+            if (this.match('LEFT_PAREN')) {
                 expr = this.finishCall(expr);
             } else {
                 break;
@@ -304,36 +304,36 @@ export class Parser {
     private finishCall(callee: Expr) {
         const args = [];
 
-        if (!this.check(T.RIGHT_PAREN)) {
+        if (!this.check('RIGHT_PAREN')) {
             do {
                 if (args.length >= 255) {
                     this.error(this.peek(), "Cannot have more than 255 arguments.");
                 }
                 args.push(this.expression());
-            } while (this.match(T.COMMA));
+            } while (this.match('COMMA'));
         }
 
-        const paren = this.consume(T.RIGHT_PAREN, "Expect ')' after arguments.");
+        const paren = this.consume('RIGHT_PAREN', "Expect ')' after arguments.");
 
         return new Call(callee, paren, args);
     }
 
     private primary() {
-        if (this.match(T.FALSE)) return new Literal(false);
-        if (this.match(T.TRUE)) return new Literal(true);
-        if (this.match(T.NIL)) return new Literal(null);
+        if (this.match('FALSE')) return new Literal(false);
+        if (this.match('TRUE')) return new Literal(true);
+        if (this.match('NIL')) return new Literal(null);
 
-        if (this.match(T.NUMBER, T.STRING)) {
+        if (this.match('NUMBER', 'STRING')) {
             return new Literal(this.previous().literal);
         }
 
-        if (this.match(T.IDENTIFIER)) {
+        if (this.match('IDENTIFIER')) {
             return new Variable(this.previous());
         }
 
-        if (this.match(T.LEFT_PAREN)) {
+        if (this.match('LEFT_PAREN')) {
             const expr = this.expression();
-            this.consume(T.RIGHT_PAREN, "Expect ')' after expression!");
+            this.consume('RIGHT_PAREN', "Expect ')' after expression!");
             return new Grouping(expr);
         }
 
@@ -368,7 +368,7 @@ export class Parser {
     }
 
     private isAtEnd() {
-        return this.peek().type === T.EOF;
+        return this.peek().type === 'EOF';
     }
 
     private peek() {
@@ -388,17 +388,17 @@ export class Parser {
         this.advance();
 
         while (!this.isAtEnd()) {
-            if (this.previous().type === T.SEMICOLON) return;
+            if (this.previous().type === 'SEMICOLON') return;
 
             switch (this.peek().type) {
-                case T.CLASS:
-                case T.FUN:
-                case T.VAR:
-                case T.FOR:
-                case T.IF:
-                case T.WHILE:
-                case T.PRINT:
-                case T.RETURN:
+                case 'CLASS':
+                case 'FUN':
+                case 'VAR':
+                case 'FOR':
+                case 'IF':
+                case 'WHILE':
+                case 'PRINT':
+                case 'RETURN':
                     return;
             }
 
