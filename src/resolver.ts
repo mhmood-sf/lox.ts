@@ -31,7 +31,7 @@ type visitable = {
     accept: (visitor: any) => any;
 }
 
-type FunctionType = 'NONE' | 'FUNCTION';
+type FunctionType = 'NONE' | 'FUNCTION' | 'METHOD';
 
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     private interpreter: Interpreter;
@@ -51,6 +51,11 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     public visitClassStmt(stmt: Class) {
         this.declare(stmt.name);
         this.define(stmt.name);
+
+        for (const method of stmt.methods) {
+            const declaration: FunctionType = 'METHOD';
+            this.resolveFunction(method, declaration);
+        }
     }
 
     public visitExpressionStmt(stmt: Expression) {

@@ -31,7 +31,7 @@ export class Environment {
         const ancestor = this.ancestor(distance);
         if (ancestor) {
             const val = ancestor.values.get(name.lexeme);
-            return val !== undefined ? val : null;
+            return val === undefined ? null : val;
         } else {
             // Ignore this part, it'll probably never execute.
             // Probably. :v
