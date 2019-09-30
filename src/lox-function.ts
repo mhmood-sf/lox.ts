@@ -8,16 +8,18 @@ import { LoxInstance } from './lox-instance';
 export class LoxFunction implements LoxCallable {
     private declaration: Func;
     private closure: Environment;
+    private isInitializer: boolean;
 
-    public constructor(declaration: Func, closure: Environment) {
+    public constructor(declaration: Func, closure: Environment, isInitializer: boolean) {
         this.declaration = declaration;
         this.closure = closure;
+        this.isInitializer = isInitializer;
     }
 
     public bind(instance: LoxInstance) {
         const environment = new Environment(this.closure);
         environment.define("this", instance);
-        return new LoxFunction(this.declaration, environment);
+        return new LoxFunction(this.declaration, environment, this.isInitializer);
     }
 
     public arity() {
@@ -34,10 +36,16 @@ export class LoxFunction implements LoxCallable {
         try {
             interpreter.executeBlock(this.declaration.body, environment);
         } catch (err) {
+            if (this.isInitializer) {
+                return this.closure.getAt(0, "this");
+            }
+
             if (err instanceof ReturnException) {
                 return err.value;
             }
         }
+
+        if (this.isInitializer) return this.closure.getAt(0, "this");
         return null;
     }
 

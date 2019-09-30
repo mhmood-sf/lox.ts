@@ -137,7 +137,7 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     private lookupVariable(name: Token, expr: Expr) {
         const distance = this.locals.get(expr);
         if (distance !== undefined) {
-            return this.environment.getAt(distance, name);
+            return this.environment.getAt(distance, name.lexeme);
         } else {
             return this.globals.get(name);
         }
@@ -264,7 +264,7 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
 
         const methods: Map<string, LoxFunction> = new Map();
         for (const method of stmt.methods) {
-            const func = new LoxFunction(method, this.environment);
+            const func = new LoxFunction(method, this.environment, method.name.lexeme === "init");
             methods.set(method.name.lexeme, func);
         }
 
@@ -277,7 +277,7 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     }
 
     public visitFuncStmt(stmt: Func) {
-        const func = new LoxFunction(stmt, this.environment);
+        const func = new LoxFunction(stmt, this.environment, false);
         this.environment.define(stmt.name.lexeme, func);
     }
 

@@ -1,6 +1,8 @@
 import { LoxCallable } from "./lox-callable";
 import { LoxInstance } from './lox-instance';
 import { LoxFunction } from "./lox-function";
+import { Interpreter } from "./interpreter";
+import { LoxLiteral } from "./token";
 
 export class LoxClass implements LoxCallable {
     public name: string;
@@ -19,8 +21,15 @@ export class LoxClass implements LoxCallable {
         return null;
     }
 
-    public call() {
-        return new LoxInstance(this);
+    public call(interpreter: Interpreter, args: LoxLiteral[]) {
+        const instance = new LoxInstance(this);
+
+        const initializer = this.findMethod("init");
+        if (initializer !== null) {
+            initializer.bind(instance).call(interpreter, args);
+        }
+
+        return instance;
     }
 
     public toString() {
@@ -28,6 +37,8 @@ export class LoxClass implements LoxCallable {
     }
 
     public arity() {
-        return 0;
+        const initializer = this.findMethod("init");
+        if (initializer === null) return 0;
+        return initializer.arity();
     }
 }

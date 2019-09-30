@@ -30,7 +30,7 @@ import {
 
 type visitable = { accept: (visitor: any) => any; }
 
-type FunctionType = 'NONE' | 'FUNCTION' | 'METHOD';
+type FunctionType = 'NONE' | 'FUNCTION' | 'METHOD' | 'INITIALIZER';
 type ClassType = 'NONE' | 'CLASS';
 
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
@@ -60,7 +60,10 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         this.scopes[this.scopes.length - 1].set("this", true);
 
         for (const method of stmt.methods) {
-            const declaration: FunctionType = 'METHOD';
+            let declaration: FunctionType = 'METHOD';
+            if (method.name.lexeme === 'init') {
+                declaration = 'INITIALIZER';
+            }
             this.resolveFunction(method, declaration);
         }
 
@@ -88,6 +91,9 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         }
         
         if (stmt.value != null) {
+            if (this.currentFunction === 'INITIALIZER') {
+                Lox.error(stmt.keyword, "Cannot return a value from an initializer.");
+            }
             this.resolve(stmt.value);
         }
     }

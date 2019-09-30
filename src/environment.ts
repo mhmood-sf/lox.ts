@@ -24,18 +24,15 @@ export class Environment {
         else throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
     }
 
-    // Takes name: Token instead of name: string like in the book
-    // so that I can throw a RuntimeError instead of a normal Error
-    // for consistency.
-    public getAt(distance: number, name: Token) {
+    public getAt(distance: number, name: string) {
         const ancestor = this.ancestor(distance);
         if (ancestor) {
-            const val = ancestor.values.get(name.lexeme);
+            const val = ancestor.values.get(name);
             return val === undefined ? null : val;
         } else {
             // Ignore this part, it'll probably never execute.
             // Probably. :v
-            throw new RuntimeError(name, `Cannot access unresolved variable '${name.lexeme}'.`);
+            throw new Error(`Cannot access unresolved variable '${name}'.`);
         }
     }
 
