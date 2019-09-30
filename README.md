@@ -2,8 +2,9 @@
 TypeScript implementation of Lox from the book [Crafting Interpreters.](https://craftinginterpreters.com)
 
 ### Usage
-- Clone the repo
-- Install node.js
-- `npm install typescript @types/node`
-- `npm run build`
-- `.\lox` or `.\lox [script]`
+- clone the repo
+- install node.js
+- run `npm install`
+- run `npm run build`
+- run `npm run tests`
+- run `./lox` or `./lox [script]`
