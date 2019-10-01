@@ -9,12 +9,13 @@ export interface Visitor<T> {
     visitLiteralExpr: (expr: Literal) => T;
     visitLogicalExpr: (expr: Logical) => T;
     visitSetterExpr: (expr: Setter) => T;
+    visitSuperExpr: (expr: Super) => T;
     visitThisExpr: (expr: This) => T;
     visitUnaryExpr: (expr: Unary) => T;
     visitVariableExpr: (expr: Variable) => T;
 }
 
-export type Expr = Assign | Binary | Call | Getter | Grouping | Literal | Logical | Setter | This | Unary | Variable;
+export type Expr = Assign | Binary | Call | Getter | Grouping | Literal | Logical | Setter | Super | This | Unary | Variable;
 
 export class Assign {
     public name: Token;
@@ -129,6 +130,20 @@ export class Setter {
 
     public accept<T>(visitor: Visitor<T>): T {
         return visitor.visitSetterExpr(this);
+    }
+}
+
+export class Super {
+    public keyword: Token;
+    public method: Token;
+
+    public constructor(keyword: Token, method: Token) {
+        this.keyword = keyword;
+        this.method = method;
+    }
+
+    public accept<T>(visitor: Visitor<T>): T {
+        return visitor.visitSuperExpr(this);
     }
 }
 

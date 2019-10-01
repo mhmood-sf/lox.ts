@@ -1,8 +1,33 @@
 import { Token } from './token';
-import { Stmt, Print, Expression, Var, Block, If, While, Func, Return, Class } from './stmt';
 import { TokenType } from './token-type';
-import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical, Call, Getter, Setter, This } from './expr';
 import { Lox } from './lox';
+import {
+    Stmt,
+    Print,
+    Expression,
+    Var,
+    Block,
+    If,
+    While,
+    Func,
+    Return,
+    Class
+} from './stmt';
+import {
+    Expr,
+    Binary,
+    Unary,
+    Literal,
+    Grouping,
+    Variable,
+    Assign,
+    Logical,
+    Call,
+    Getter,
+    Setter,
+    This,
+    Super
+} from './expr';
 
 export class Parser {
     private tokens: Token[];
@@ -235,6 +260,13 @@ export class Parser {
 
     private classDeclaration() {
         const name = this.consume('IDENTIFIER', "Expect class name.");
+
+        let superclass = null;
+        if (this.match('LESS')) {
+            this.consume('IDENTIFIER', "Expect superclass name.");
+            superclass = new Variable(this.previous());
+        }
+
         this.consume('LEFT_BRACE', "Expect '{' before class body.");
 
         const methods = [];
@@ -244,7 +276,7 @@ export class Parser {
 
         this.consume('RIGHT_BRACE', "Expect '}' after class body.");
 
-        return new Class(name, methods);
+        return new Class(name, superclass, methods);
     }
 
     private equality() {
@@ -346,6 +378,13 @@ export class Parser {
 
         if (this.match('NUMBER', 'STRING')) {
             return new Literal(this.previous().literal);
+        }
+
+        if (this.match('SUPER')) {
+            const keyword = this.previous();
+            this.consume('DOT', "Expect '.' after super.");
+            const method = this.consume('IDENTIFIER', "Expect superclass method name.");
+            return new Super(keyword, method);
         }
 
         if (this.match('THIS')) {

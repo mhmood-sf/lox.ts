@@ -7,16 +7,22 @@ import { LoxLiteral } from "./token";
 export class LoxClass implements LoxCallable {
     public name: string;
     private methods: Map<string, LoxFunction>;
+    private superclass: LoxClass | null;
 
-    public constructor(name: string, methods: Map<string, LoxFunction>) {
+    public constructor(name: string, superclass: LoxClass | null, methods: Map<string, LoxFunction>) {
         this.name = name;
         this.methods = methods;
+        this.superclass = superclass;
     }
 
-    public findMethod(name: string) {
+    public findMethod(name: string): LoxFunction | null {
         if (this.methods.has(name)) {
             const method = this.methods.get(name);
             return method === undefined ? null : method;
+        }
+
+        if (this.superclass !== null) {
+            return this.superclass.findMethod(name);
         }
         return null;
     }

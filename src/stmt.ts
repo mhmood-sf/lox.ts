@@ -1,4 +1,4 @@
-import { Expr } from "./expr";
+import { Expr, Variable } from "./expr";
 import { Token } from "./token";
 
 export interface Visitor<T> {
@@ -29,10 +29,12 @@ export class Block {
 
 export class Class {
     public name: Token;
+    public superclass: Variable | null;
     public methods: Func[];
 
-    public constructor(name: Token, methods: Func[]) {
+    public constructor(name: Token, superclass: Variable | null, methods: Func[]) {
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
     }
 

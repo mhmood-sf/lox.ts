@@ -19,7 +19,8 @@ import {
     Call,
     Getter,
     Setter,
-    This
+    This,
+    Super
 } from './expr';
 import {
     Visitor as StmtVisitor,
@@ -105,6 +106,31 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
         const val = this.evaluate(expr.val);
         obj.set(expr.name, val);
         return val;
+    }
+
+    public visitSuperExpr(expr: Super) {
+        const distance = this.locals.get(expr);
+        if (distance) {
+            const superclass = this.environment.getAt(distance, "super");
+            if (superclass instanceof LoxClass) {
+                // "this" is always one level nearer than "super"'s environment
+                const obj = this.environment.getAt(distance - 1, "this");
+                const method = superclass.findMethod(expr.method.lexeme);
+                if (method !== null) {
+                    if (obj instanceof LoxInstance) {
+                        return method.bind(obj);
+                    } else {
+                        throw new RuntimeError(expr.keyword, "'this' does not point to a LoxInstance in the superclass.");
+                    }
+                } else {
+                    throw new RuntimeError(expr.method, `Undefined property '${expr.method.lexeme}'.`);
+                }
+            } else {
+                throw new RuntimeError(expr.keyword, "'super' does not point to a class.");
+            }
+        } else {
+            throw new RuntimeError(expr.keyword, "Unresolved super expression.");
+        }
     }
 
     public visitThisExpr(expr: This) {
@@ -260,7 +286,20 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
     }
 
     public visitClassStmt(stmt: Class) {
+        let superclass = null;
+        if (stmt.superclass !== null) {
+            superclass = this.evaluate(stmt.superclass);
+            if (!(superclass instanceof LoxClass)) {
+                throw new RuntimeError(stmt.superclass.name, "Superclass must be a class.");
+            }
+        }
+
         this.environment.define(stmt.name.lexeme, null);
+
+        if (stmt.superclass !== null) {
+            this.environment = new Environment(this.environment);
+            this.environment.define("super", superclass);
+        }
 
         const methods: Map<string, LoxFunction> = new Map();
         for (const method of stmt.methods) {
@@ -268,7 +307,12 @@ export class Interpreter implements ExprVisitor<LoxLiteral>, StmtVisitor<void> {
             methods.set(method.name.lexeme, func);
         }
 
-        const _class = new LoxClass(stmt.name.lexeme, methods);
+        const _class = new LoxClass(stmt.name.lexeme, superclass, methods);
+
+        if (superclass !== null) {
+            this.environment = this.environment.enclosing ? this.environment.enclosing : this.environment;
+        }
+
         this.environment.assign(stmt.name, _class);
     }
 

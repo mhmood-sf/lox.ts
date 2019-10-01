@@ -13,7 +13,8 @@ import {
     Unary,
     Getter,
     Setter,
-    This
+    This,
+    Super
 } from "./expr";
 import {
     Visitor as StmtVisitor,
@@ -31,7 +32,7 @@ import {
 type visitable = { accept: (visitor: any) => any; }
 
 type FunctionType = 'NONE' | 'FUNCTION' | 'METHOD' | 'INITIALIZER';
-type ClassType = 'NONE' | 'CLASS';
+type ClassType = 'NONE' | 'CLASS' | 'SUBCLASS';
 
 export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     private interpreter: Interpreter;
@@ -56,6 +57,20 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         this.declare(stmt.name);
         this.define(stmt.name);
 
+        if ((stmt.superclass !== null) && (stmt.name.lexeme === stmt.superclass.name.lexeme)) {
+            Lox.error(stmt.superclass.name, "A class cannot inherit from itself.");
+        }
+
+        if (stmt.superclass !== null) {
+            this.currentClass = 'SUBCLASS';
+            this.resolve(stmt.superclass);
+        }
+
+        if (stmt.superclass !== null) {
+            this.beginScope();
+            this.scopes[this.scopes.length - 1].set("super", true);
+        }
+
         this.beginScope();
         this.scopes[this.scopes.length - 1].set("this", true);
 
@@ -68,6 +83,11 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
         }
 
         this.endScope();
+
+        if (stmt.superclass !== null) {
+            this.endScope();
+        }
+
         this.currentClass = enclosingClass;
     }
 
@@ -134,6 +154,16 @@ export class Resolver implements ExprVisitor<void>, StmtVisitor<void> {
     public visitSetterExpr(expr: Setter) {
         this.resolve(expr.val);
         this.resolve(expr.obj);
+    }
+
+    public visitSuperExpr(expr: Super) {
+        if (this.currentClass === 'NONE') {
+            Lox.error(expr.keyword, "Cannot use 'super' outside of a class.");
+        } else if (this.currentClass !== 'SUBCLASS') {
+            Lox.error(expr.keyword, "Cannot use 'super' in a class with no superclass.");
+        }
+
+        this.resolveLocal(expr, expr.keyword);
     }
 
     public visitThisExpr(expr: This) {

@@ -4,7 +4,7 @@ import { LoxCallable } from './lox-callable';
 
 export class Environment {
     private values: Map<string, LoxLiteral | LoxCallable> = new Map();
-    private enclosing?: Environment;
+    public enclosing?: Environment;
 
     public constructor(enclosing?: Environment) {
         if (enclosing) this.enclosing = enclosing;

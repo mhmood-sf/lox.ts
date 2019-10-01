@@ -79,6 +79,7 @@ function defineAst(outDir, baseName, types, imports) {
         "Literal  : value: LoxLiteral",
         "Logical  : left: Expr, operator: Token, right: Expr",
         "Setter   : obj: Expr, name: Token, val: Expr", // Named Setter instead of Set cause of collision with the JS Set
+        "Super    : keyword: Token, method: Token",
         "This     : keyword: Token", 
         "Unary    : operator: Token, right: Expr",
         "Variable : name: Token"
@@ -86,7 +87,7 @@ function defineAst(outDir, baseName, types, imports) {
 
     defineAst(outDir, "Stmt", [
         "Block      : statements: Stmt[]",
-        "Class      : name: Token, methods: Func[]",
+        "Class      : name: Token, superclass: Variable | null, methods: Func[]",
         "Expression : expression: Expr",
         "Func       : name: Token, params: Token[], body: Stmt[]",
         "If         : condition: Expr, thenBranch: Stmt, elseBranch: Stmt | null",
@@ -95,6 +96,6 @@ function defineAst(outDir, baseName, types, imports) {
         // initializer is Expr | null to stop typescript from complaining.
         "Var        : name: Token, initializer: Expr | null",
         "While      : condition: Expr, body: Stmt"
-    ], 'import { Expr } from "./expr";\nimport { Token } from "./token"');
+    ], 'import { Expr, Variable } from "./expr";\nimport { Token } from "./token"');
 
 })();
