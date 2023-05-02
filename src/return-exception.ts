@@ -1,9 +1,9 @@
-import { LoxLiteral } from './token';
+import { LoxLiteral } from "./token.ts";
 
 export class ReturnException {
-    public value: LoxLiteral;
+  public value: LoxLiteral;
 
-    public constructor(value: LoxLiteral) {
-        this.value = value;
-    }
+  public constructor(value: LoxLiteral) {
+    this.value = value;
+  }
 }
